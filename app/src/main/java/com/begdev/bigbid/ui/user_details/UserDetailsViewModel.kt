@@ -1,4 +1,4 @@
-package com.begdev.bigbid.user_details
+package com.begdev.bigbid.ui.user_details
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package com.begdev.bigbid.user_details
+package com.begdev.bigbid.ui.user_details
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.IconButton

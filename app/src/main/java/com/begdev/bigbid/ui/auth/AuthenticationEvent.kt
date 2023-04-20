@@ -1,4 +1,4 @@
-package com.begdev.bigbid.auth
+package com.begdev.bigbid.ui.auth
 
 sealed class AuthenticationEvent{
     object ToggleAuthenticationMode: AuthenticationEvent()

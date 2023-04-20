@@ -1,4 +1,4 @@
-package com.begdev.bigbid.auth
+package com.begdev.bigbid.ui.auth
 
 import android.content.ContentValues.TAG
 import android.util.Log
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class AuthenticationViewModel @Inject constructor(
     private val appNavigator: AppNavigator,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AuthenticationState())
+//    private val _uiState = MutableStateFlow(AuthenticationState())
     val uiState = MutableStateFlow(AuthenticationState())
 
 
@@ -71,9 +71,9 @@ class AuthenticationViewModel @Inject constructor(
         uiState.value = uiState.value.copy(
             isLoading = true
         )
+        navigateToHomeScreen()
         viewModelScope.launch(Dispatchers.IO) {
             delay(2000L)
-
             withContext(Dispatchers.Main) {
                 uiState.value = uiState.value.copy(
                     isLoading = false,
@@ -83,9 +83,10 @@ class AuthenticationViewModel @Inject constructor(
         }
     }
 
-    fun navigateToMainScreen() {
+    fun navigateToHomeScreen() {
         Log.d(TAG, "onNavigateToRegisterBtnClicked: before navigation")
         appNavigator.tryNavigateTo(Destination.HomeScreen())
+//        appNavigator.tryNavigateTo(Destination.RegisterScreen())
         Log.d(TAG, "onNavigateToRegisterBtnClicked: after navigation click ??????")
     }
 

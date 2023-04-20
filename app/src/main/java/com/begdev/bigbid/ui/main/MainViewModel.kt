@@ -1,4 +1,4 @@
-package com.begdev.bigbid.main
+package com.begdev.bigbid.ui.main
 
 import androidx.lifecycle.ViewModel
 import com.begdev.bigbid.nav_utils.AppNavigator

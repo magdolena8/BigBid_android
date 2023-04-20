@@ -1,4 +1,4 @@
-package com.begdev.bigbid.auth
+package com.begdev.bigbid.ui.auth
 
 import android.content.ContentValues
 import android.util.Log
@@ -16,8 +16,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.begdev.bigbid.main.MainViewModel
-import com.begdev.bigbid.ui.theme.BigBidTheme
+import com.begdev.bigbid.ui.main.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

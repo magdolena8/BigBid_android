@@ -1,4 +1,4 @@
-package com.begdev.bigbid.auth
+package com.begdev.bigbid.ui.auth
 
 import androidx.annotation.StringRes
 import com.begdev.bigbid.R

@@ -1,4 +1,4 @@
-package com.begdev.bigbid.main
+package com.begdev.bigbid.ui.main
 
 import android.app.Activity
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,15 +11,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.begdev.bigbid.auth.AuthenticationScreen
-import com.begdev.bigbid.auth.RegisterScreen
 import com.begdev.bigbid.nav_utils.Destination
 import com.begdev.bigbid.nav_utils.NavHost
 import com.begdev.bigbid.nav_utils.NavigationIntent
 import com.begdev.bigbid.nav_utils.composable
+import com.begdev.bigbid.ui.auth.AuthenticationScreen
+import com.begdev.bigbid.ui.auth.RegisterScreen
+import com.begdev.bigbid.ui.home.HomeScreen
 import com.begdev.bigbid.ui.theme.BigBidTheme
 import com.google.accompanist.insets.navigationBarsWithImePadding
-
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 
@@ -49,6 +49,9 @@ fun MainScreen(
                 }
                 composable(destination = Destination.RegisterScreen) {
                     RegisterScreen()
+                }
+                composable(destination = Destination.HomeScreen) {
+                    HomeScreen()
                 }
 //                composable(destination = Destination.UserDetailsScreen) {
 //                    UserDetailsScreen()
