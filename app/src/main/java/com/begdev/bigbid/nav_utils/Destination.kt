@@ -14,12 +14,9 @@ sealed class Destination(protected val route: String, vararg params: String) {
 
     object LoginScreen : NoArgumentsDestination("login")
     object RegisterScreen : NoArgumentsDestination("register")
+    object HomeScreen : NoArgumentsDestination("home")
 
 //    object RegisterScreen : Destination("register")
-
-//    object UsersScreen : NoArgumentsDestination("users")
-
-//    object DetailsScreen : NoArgumentsDestination("details")
 
     object UserDetailsScreen : Destination("user_details", "firstName", "lastName") {
         const val FIST_NAME_KEY = "firstName"
