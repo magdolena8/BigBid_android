@@ -7,5 +7,8 @@
     <string name="requirement_digit">At least 1 digit</string>
     <string name="requirement_characters">At least 8 characters</string>
     <string name="placeholder_email">Email</string>
+    <string name="placeholder_username">Username</string>
     <string name="placeholder_password">Password</string>
+    <string name="question_to_login_mode">Don`t have an account?</string>
+    <string name="question_to_register_mode">I already have an account</string>
 </resources>

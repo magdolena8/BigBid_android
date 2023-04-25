@@ -8,9 +8,6 @@ class ItemsRepo @Inject constructor(
     private val characterApi: ItemApi
 ) {
     suspend fun getItems(): List<Item> {
-//        val result = characterApi.getItems()
-//        Log.d(TAG, "getItems: $result")
         return characterApi.getItems()
-//        return characterApi.getItems()
     }
 }

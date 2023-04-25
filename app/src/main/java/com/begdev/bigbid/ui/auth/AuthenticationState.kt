@@ -5,8 +5,9 @@ import com.begdev.bigbid.R
 
 data class AuthenticationState(
     val authenticationMode: AuthenticationMode = AuthenticationMode.SIGN_IN,
-    val email: String = "",
-    val password: String = "",
+    val email: String = "ivanbegan16@gmail.com",
+    val username: String = "ivanbegan",
+    val password: String = "qweqweqwe",
     val repeatPassword: String = "",
     val isLoading: Boolean = false,
     val error: String? = null,

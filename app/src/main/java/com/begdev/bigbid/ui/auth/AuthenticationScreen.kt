@@ -54,7 +54,9 @@ fun AuthenticationContent(
         authenticationMode = authenticationState.authenticationMode,
         email = authenticationState.email,
         password = authenticationState.password,
+        username = authenticationState.username,
         onEmailChanged = { handleEvent(AuthenticationEvent.EmailChanged(it)) },
+        onUsernameChanged = { handleEvent(AuthenticationEvent.UsernameChanged(it)) },
         onPasswordChanged = { handleEvent(AuthenticationEvent.PasswordChanged(it)) },
         onToggleMode = { handleEvent(AuthenticationEvent.ToggleAuthenticationMode) },
         onAuthenticate = { handleEvent(AuthenticationEvent.Authenticate) }
@@ -67,8 +69,10 @@ fun AuthenticationForm(
     modifier: Modifier,
     authenticationMode: AuthenticationMode,
     email: String,
+    username: String,
     password: String,
     onEmailChanged: (email: String) -> Unit,
+    onUsernameChanged: (email: String) -> Unit,
     onPasswordChanged: (password: String) -> Unit,
     onToggleMode: () -> Unit,
     onAuthenticate: () -> Unit
@@ -91,6 +95,16 @@ fun AuthenticationForm(
                 email = email ?: "",
                 onEmailChanged = onEmailChanged
             )
+            if (authenticationMode == AuthenticationMode.SIGN_UP) {
+                UsernameInput(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(9.dp),
+                    username = username ?: "",
+                    onUsernameChanged = onUsernameChanged
+                )
+            }
+
             PasswordInput(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -102,7 +116,15 @@ fun AuthenticationForm(
                 onClick = onAuthenticate,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Login")
+                Text(
+                    stringResource(
+                        if (authenticationMode == AuthenticationMode.SIGN_IN) {
+                            R.string.label_sign_in_to_account
+                        } else {
+                            R.string.label_sign_up_for_account
+                        }
+                    )
+                )
             }
             Divider(
                 color = Color.Gray,
@@ -110,9 +132,25 @@ fun AuthenticationForm(
                 modifier = Modifier.padding(top = 100.dp)
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Don`t have an account?")
+                Text(
+                    text = stringResource(
+                        if (authenticationMode == AuthenticationMode.SIGN_IN) {
+                            R.string.question_to_login_mode
+                        } else {
+                            R.string.question_to_register_mode
+                        }
+                    )
+                )
                 TextButton(onClick = onToggleMode) {
-                    Text("SIGN UP")
+                    Text(
+                        text = stringResource(
+                            if (authenticationMode == AuthenticationMode.SIGN_IN) {
+                                R.string.label_sign_up_for_account
+                            } else {
+                                R.string.label_sign_in_to_account
+                            }
+                        )
+                    )
                 }
             }
         }
@@ -150,6 +188,25 @@ fun EmailInput(
         },
         singleLine = true,
         placeholder = { Text(stringResource(R.string.placeholder_email)) }
+
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UsernameInput(
+    modifier: Modifier = Modifier,
+    username: String?,
+    onUsernameChanged: (email: String) -> Unit
+) {
+    OutlinedTextField(
+        modifier = modifier,
+        value = username ?: "",
+        onValueChange = { username ->
+            onUsernameChanged(username)
+        },
+        singleLine = true,
+        placeholder = { Text(stringResource(R.string.placeholder_username)) }
 
     )
 }
