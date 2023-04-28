@@ -18,6 +18,7 @@ import com.begdev.bigbid.nav_utils.composable
 import com.begdev.bigbid.ui.auth.AuthenticationScreen
 import com.begdev.bigbid.ui.auth.RegisterScreen
 import com.begdev.bigbid.ui.home.HomeScreen
+import com.begdev.bigbid.ui.item.ItemScreen
 import com.begdev.bigbid.ui.theme.BigBidTheme
 import com.google.accompanist.insets.navigationBarsWithImePadding
 import kotlinx.coroutines.channels.Channel
@@ -42,7 +43,7 @@ fun MainScreen(
         ) {
             NavHost(
                 navController = navController,
-                startDestination = Destination.LoginScreen
+                startDestination = Destination.HomeScreen
             ) {
                 composable(destination = Destination.LoginScreen) {
                     AuthenticationScreen()
@@ -52,6 +53,10 @@ fun MainScreen(
                 }
                 composable(destination = Destination.HomeScreen) {
                     HomeScreen()
+                }
+
+                composable(destination = Destination.ItemScreen) {
+                    ItemScreen()
                 }
 //                composable(destination = Destination.UserDetailsScreen) {
 //                    UserDetailsScreen()

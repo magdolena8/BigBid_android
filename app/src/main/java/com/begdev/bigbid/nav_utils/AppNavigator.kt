@@ -4,7 +4,6 @@ import kotlinx.coroutines.channels.Channel
 
 interface AppNavigator {
     val navigationChannel: Channel<NavigationIntent>
-
     suspend fun navigateBack(
         route: String? = null,
         inclusive: Boolean = false,

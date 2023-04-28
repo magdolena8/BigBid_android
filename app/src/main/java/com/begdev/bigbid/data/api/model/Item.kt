@@ -16,7 +16,7 @@ data class Item(
     val photo: String? = null,
 
     @field:SerializedName("current_price")
-    val currentBid: Float
+    val currentBid: Float = 0.0f
 
 ) {
 

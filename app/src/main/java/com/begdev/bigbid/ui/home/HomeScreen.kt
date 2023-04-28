@@ -1,6 +1,7 @@
 package com.begdev.bigbid.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +38,7 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(30.dp),
                 itemsState = itemState,
+                handleEvent = viewModel::handleEvent,
             )
         }
     }
@@ -48,7 +49,8 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     modifier: Modifier,
-    itemsState: List<Item>
+    itemsState: List<Item>,
+    handleEvent: (event: HomeEvent) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
         if (itemsState.isEmpty()) {
@@ -61,7 +63,7 @@ fun HomeScreenContent(
             }
         }
         items(itemsState) { item: Item ->
-            ItemImageCard(item = item)
+            ItemImageCard(item = item, onItemClick = { handleEvent(HomeEvent.ItemClicked(item)) })
         }
     }
 }
@@ -69,14 +71,15 @@ fun HomeScreenContent(
 @Composable
 @ExperimentalMaterial3Api
 //@Preview(showBackground = true)
-@Preview
+//@Preview
 fun ItemImageCard(
     item: Item = Item(
         12,
         "Exotic Book",
         photo = "https://assets1.ignimgs.com/thumbs/userUploaded/2022/6/14/tmntshreddersrevengeblogroll-01-1655243147003.jpg",
         currentBid = 12.1F
-    )
+    ),
+    onItemClick: (Item) -> Unit
 ) {
     val imagerPainter = rememberImagePainter(
         data = ApiConstants.PHOTOS_END_POINT + item.photo,
@@ -95,7 +98,8 @@ fun ItemImageCard(
                 defaultElevation = 10.dp
             ),
             modifier = Modifier
-                .padding(3.dp),
+                .padding(3.dp)
+                .clickable { onItemClick(item) },
             shape = RoundedCornerShape(10.dp),
         ) {
             Column(
@@ -107,7 +111,7 @@ fun ItemImageCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
-                        .padding(0.dp,0.dp,0.dp,3.dp),
+                        .padding(0.dp, 0.dp, 0.dp, 3.dp),
                     contentScale = ContentScale.FillBounds
                 )
 
