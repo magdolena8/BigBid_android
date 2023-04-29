@@ -11,4 +11,7 @@
     <string name="placeholder_password">Password</string>
     <string name="question_to_login_mode">Don`t have an account?</string>
     <string name="question_to_register_mode">I already have an account</string>
+    <string name="auth">Authenticate</string>
+    <string name="home">Home</string>
+    <string name="profile">Profile</string>
 </resources>
