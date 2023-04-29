@@ -21,7 +21,6 @@ import com.begdev.bigbid.data.api.ApiConstants
 import com.begdev.bigbid.data.api.model.Item
 import com.begdev.bigbid.ui.theme.BigBidTheme
 
-
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()

@@ -12,22 +12,23 @@ import javax.inject.Inject
 class UsersRepo @Inject constructor(
     private val characterApi: AuthApi,
 ) {
-    private var currentUser: Person? = null
+    var currentUser: Person? = Person(id = 1)
+
 
     suspend fun loginUser(credentials: LoginCredentials): Response<Person> {
         val response = characterApi.loginUser(credentials)
-        if(response.isSuccessful){
+        if (response.isSuccessful) {
             currentUser = response.body()
-            Log.d(TAG, "loginUser: "+currentUser)
+            Log.d(TAG, "loginUser: " + currentUser)
         }
         return response
     }
 
-    suspend fun registerUser(credentials:RegisterCredentials): Response<Person> {
+    suspend fun registerUser(credentials: RegisterCredentials): Response<Person> {
         val response = characterApi.registerUser(credentials)
-        if(response.isSuccessful){
+        if (response.isSuccessful) {
             currentUser = response.body()
-            Log.d(TAG, "registerUser: "+currentUser)
+            Log.d(TAG, "registerUser: " + currentUser)
         }
         return response
     }

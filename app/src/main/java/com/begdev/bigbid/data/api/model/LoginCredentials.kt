@@ -8,7 +8,6 @@ data class LoginCredentials (
 
 data class RegisterCredentials (
     var email: String? = null,
-//    var loginType: LoginType? = null,
     var username: String? = null,
     val passwordHash: String? = null
 )

@@ -6,12 +6,13 @@ sealed class ItemEvent {
     class CurrentPriceChanged(val newPrice: Float):
         ItemEvent()
 
-//    class UsernameChanged(val username: String):
-//        ItemEvent()
+    class UserBidChanged(val bid: Float):
+        ItemEvent()
 
 //    class PasswordChanged(val password: String):
 //        ItemEvent()
 
-    class PlaceBid (val newPrice:Float): ItemEvent()
+//    class PlaceBid (val newPrice:Float): ItemEvent()
+    object PlaceBid: ItemEvent()
     object AddToFavourite: ItemEvent()
 }

@@ -16,8 +16,24 @@ data class Item(
     val photo: String? = null,
 
     @field:SerializedName("current_price")
-    val currentBid: Float = 0.0f
+    val currentBid: Float = 0.0f,
 
-) {
+    @field:SerializedName("owner_id")
+    val ownerId: Int? = null,
+
+    @field:SerializedName("category")
+    val category: String? = null,
+
+    @field:SerializedName("bidding_cond")
+    val biddingCondition: String? = null,
+
+    @field:SerializedName("bids_total")
+    val bidsTotalCount: String? = null,
+
+    @field:SerializedName("auc_end_time")
+    val auctionEndTime: String? = null,
+
+
+    ) {
 
 }

@@ -54,7 +54,6 @@ fun MainScreen(
                 composable(destination = Destination.HomeScreen) {
                     HomeScreen()
                 }
-
                 composable(destination = Destination.ItemScreen) {
                     ItemScreen()
                 }
