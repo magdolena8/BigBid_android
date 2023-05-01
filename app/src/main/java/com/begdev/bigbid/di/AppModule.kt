@@ -15,14 +15,4 @@ interface AppModule {
     @Binds
     fun bindAppNavigator(appNavigatorImpl: AppNavigatorImpl): AppNavigator
 
-//    @Provides
-//    @Singleton
-////    @Binds
-//    fun provideRetrofit(): Retrofit.Builder{
-//        return Retrofit.Builder()
-//            .baseUrl(ApiConstants.BASE_URL)
-//            .addConverterFactory(GsonConverterFactory.create())
-//    }
-
-
 }

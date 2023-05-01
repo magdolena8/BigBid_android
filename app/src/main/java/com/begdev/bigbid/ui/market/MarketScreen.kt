@@ -1,4 +1,4 @@
-package com.begdev.bigbid.ui.home
+package com.begdev.bigbid.ui.market
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -22,8 +22,8 @@ import com.begdev.bigbid.data.api.model.Item
 import com.begdev.bigbid.ui.theme.BigBidTheme
 
 @Composable
-fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel()
+fun MarketScreen(
+    viewModel: MarketViewModel = hiltViewModel()
 ) {
     val itemState = viewModel.itemsState
     Surface(
@@ -32,7 +32,7 @@ fun HomeScreen(
             .fillMaxWidth()
     ) {
         BigBidTheme {
-            HomeScreenContent(
+            MarketScreenContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(30.dp),
@@ -46,10 +46,10 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenContent(
+fun MarketScreenContent(
     modifier: Modifier,
     itemsState: List<Item>,
-    handleEvent: (event: HomeEvent) -> Unit
+    handleEvent: (event: MarketEvent) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
         if (itemsState.isEmpty()) {
@@ -62,7 +62,7 @@ fun HomeScreenContent(
             }
         }
         items(itemsState) { item: Item ->
-            ItemImageCard(item = item, onItemClick = { handleEvent(HomeEvent.ItemClicked(item)) })
+            ItemImageCard(item = item, onItemClick = { handleEvent(MarketEvent.ItemClicked(item)) })
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.begdev.bigbid.ui.home
+package com.begdev.bigbid.ui.market
 
 data class HomeState (
     val userId: String = "",

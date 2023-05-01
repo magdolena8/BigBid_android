@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.begdev.bigbid.R
 
 sealed class Screen(val route: String, @StringRes val resourceId: Int) {
-    object Home : Screen("home", R.string.home)
-    object Profile : Screen("profile", R.string.profile)
+    object Market : Screen("market", R.string.market)
+//    object Profile : Screen("profile", R.string.profile)
+    object Profile : Screen("item/10", R.string.profile)
 }

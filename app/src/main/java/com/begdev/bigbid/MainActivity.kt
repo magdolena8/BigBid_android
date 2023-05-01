@@ -5,18 +5,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
-import com.begdev.bigbid.ui.main.MainScreen
-import com.begdev.bigbid.ui.main.MainViewModel
+import com.begdev.bigbid.ui.app.AppScreen
+import com.begdev.bigbid.ui.app.AppViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val mainViewModel: MainViewModel by viewModels()
+    private val mainViewModel: AppViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            MainScreen()
+            AppScreen()
         }
     }
 }

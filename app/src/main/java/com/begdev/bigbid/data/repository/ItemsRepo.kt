@@ -7,7 +7,7 @@ import javax.inject.Inject
 class ItemsRepo @Inject constructor(
     private val itemsApi: ItemApi
 ) {
-    suspend fun getItemsHome(): List<Item> {
+    suspend fun getItemsMarket(): List<Item> {
         return itemsApi.getItemsHome()
     }
 

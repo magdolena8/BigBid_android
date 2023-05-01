@@ -1,12 +1,12 @@
-package com.begdev.bigbid.ui.home
+package com.begdev.bigbid.ui.market
 
 import com.begdev.bigbid.data.api.model.Item
 
-sealed class HomeEvent{
+sealed class MarketEvent{
 //    object ToggleAuthenticationMode: HomeEvent()
 
     class ItemClicked(val itemId: Item):
-        HomeEvent()
+        MarketEvent()
 
 
 }

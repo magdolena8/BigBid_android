@@ -141,12 +141,11 @@ class AuthenticationViewModel @Inject constructor(
                 Log.d(TAG, "registerPerson: ERRORRRRR")
             }
         }
-
     }
 
     fun navigateToHomeScreen() {
         Log.d(TAG, "onNavigateToRegisterBtnClicked: before navigation")
-        appNavigator.tryNavigateTo(Destination.HomeScreen())
+        appNavigator.tryNavigateTo(Destination.MainScreen())
 //        appNavigator.tryNavigateTo(Destination.RegisterScreen())
         Log.d(TAG, "onNavigateToRegisterBtnClicked: after navigation click ??????")
     }

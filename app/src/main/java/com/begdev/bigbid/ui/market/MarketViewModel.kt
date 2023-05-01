@@ -1,4 +1,4 @@
-package com.begdev.bigbid.ui.home
+package com.begdev.bigbid.ui.market
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class MarketViewModel @Inject constructor(
     private val appNavigator: AppNavigator,
     private val itemsRepo: ItemsRepo
 ) : ViewModel() {
@@ -22,21 +22,26 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val items = itemsRepo.getItemsHome()
+            val items = itemsRepo.getItemsMarket()
             _itemsState.addAll(items)
         }
     }
 
-    fun handleEvent(homeEvent: HomeEvent) {
-        when (homeEvent) {
-            is HomeEvent.ItemClicked -> {
-                navigateToItemScreen(homeEvent.itemId)
+    fun handleEvent(marketEvent: MarketEvent) {
+        when (marketEvent) {
+            is MarketEvent.ItemClicked -> {
+                navigateToItemScreen(marketEvent.itemId)
             }
         }
     }
+//    fun navigateToItemScreen(item:Item){
+//        appNavigator.tryNavigateTo(Destination.ItemScreen(item.id!!))
+//    }
+
     fun navigateToItemScreen(item:Item){
-        appNavigator.tryNavigateTo(Destination.ItemScreen(item.id!!))
+        appNavigator.tryNavigateTo(Destination.ProfileScreen())
     }
+
 
 
 }

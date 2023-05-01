@@ -16,13 +16,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.begdev.bigbid.ui.main.MainViewModel
+import com.begdev.bigbid.ui.app.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun RegisterScreen(
-    mainViewModel: MainViewModel = hiltViewModel(),
+    mainViewModel: AppViewModel = hiltViewModel(),
 ) {
 //    val navController = rememberNavController()
 

@@ -13,25 +13,12 @@ sealed class Destination(protected val route: String, vararg params: String) {
     }
 
     object LoginScreen : NoArgumentsDestination("login")
-//    object RegisterScreen : NoArgumentsDestination("register")
-    object HomeScreen : NoArgumentsDestination("home")
+    object MarketScreen : NoArgumentsDestination("market")
+    object MainScreen : NoArgumentsDestination("main")
     object ProfileScreen : NoArgumentsDestination("profile")
-
-//    object RegisterScreen : Destination("register")
-
-//    object UserDetailsScreen : Destination("user_details", "firstName", "lastName") {
-//        const val FIST_NAME_KEY = "firstName"
-//        const val LAST_NAME_KEY = "lastName"
-//
-//        operator fun invoke(fistName: String, lastName: String): String = route.appendParams(
-//            FIST_NAME_KEY to fistName,
-//            LAST_NAME_KEY to lastName
-//        )
-//    }
 
     object ItemScreen : Destination("item", "itemId") {
         const val ITEM_ID = "item"
-
         operator fun invoke(itemId: Int): String = route.appendParams(
             ITEM_ID to itemId,
         )
