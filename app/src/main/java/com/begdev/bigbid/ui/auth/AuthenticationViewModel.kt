@@ -2,49 +2,58 @@ package com.begdev.bigbid.ui.auth
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.begdev.bigbid.data.api.model.LoginCredentials
 import com.begdev.bigbid.data.api.model.LoginType
 import com.begdev.bigbid.data.api.model.RegisterCredentials
 import com.begdev.bigbid.data.repository.UsersRepo
-import com.begdev.bigbid.nav_utils.AppNavigator
-import com.begdev.bigbid.nav_utils.Destination
+import com.begdev.bigbid.nav_utils.Screen
 import com.begdev.bigbid.utils.md5
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-    private val appNavigator: AppNavigator,
     private val usersRepo: UsersRepo
 
 ) : ViewModel() {
     val uiState = MutableStateFlow(AuthenticationState())
+    val isLoggedIn = mutableStateOf(false)
+    val loginError = mutableStateOf(false)
+
+    private val _navigationEvent = MutableSharedFlow<String>()
+    val navigationEvent: SharedFlow<String> = _navigationEvent
 
     fun handleEvent(authenticationEvent: AuthenticationEvent) {
         when (authenticationEvent) {
             is AuthenticationEvent.ToggleAuthenticationMode -> {
                 toggleAuthenticationMode()
             }
+
             is AuthenticationEvent.EmailChanged -> {
                 updateEmail(authenticationEvent.emailAddress)
             }
+
             is AuthenticationEvent.UsernameChanged -> {
                 updateUsername(authenticationEvent.username)
             }
+
             is AuthenticationEvent.PasswordChanged -> {
                 updatePassword(authenticationEvent.password)
             }
+
             is AuthenticationEvent.Authenticate -> {
                 authenticate()
             }
         }
     }
-
 
     private fun toggleAuthenticationMode() {
         val authenticationMode = uiState.value.authenticationMode
@@ -117,12 +126,15 @@ class AuthenticationViewModel @Inject constructor(
             credentials.loginType = LoginType.username
         }
 
-//        val person = usersRepo.loginUser(credentials)
         val response = usersRepo.loginUser(credentials)
         if (response.isSuccessful) {
+            uiState.value = uiState.value.copy(
+                isSuccess = true
+            )
             navigateToHomeScreen()
         } else {
-
+            loginError.value = true
+            Log.d(TAG, "loginPerson: ERRORRRRR")
         }
         Log.d(TAG, "loginPerson: ${response.body()}")
     }
@@ -135,20 +147,18 @@ class AuthenticationViewModel @Inject constructor(
         if (EMAIL_REGEX.toRegex().matches(email) && USERNAME_REGEX.toRegex().matches(username)) {
             val response = usersRepo.registerUser(credentials)
             if (response.isSuccessful) {
-//                Log.d(TAG, "registerPerson: " )
+                uiState.value = uiState.value.copy(
+                    isSuccess = true
+                )
                 navigateToHomeScreen()
             } else {
+                loginError.value = true
                 Log.d(TAG, "registerPerson: ERRORRRRR")
             }
         }
-
     }
-
-    fun navigateToHomeScreen() {
-        Log.d(TAG, "onNavigateToRegisterBtnClicked: before navigation")
-        appNavigator.tryNavigateTo(Destination.HomeScreen())
-//        appNavigator.tryNavigateTo(Destination.RegisterScreen())
-        Log.d(TAG, "onNavigateToRegisterBtnClicked: after navigation click ??????")
+    private suspend fun navigateToHomeScreen() {
+        _navigationEvent.emit(Screen.Main.route)
     }
 
 }

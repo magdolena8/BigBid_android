@@ -10,8 +10,10 @@ data class AuthenticationState(
     val password: String = "qweqweqwe",
     val repeatPassword: String = "",
     val isLoading: Boolean = false,
+    val isSuccess: Boolean = false,
     val error: String? = null,
-    val passwordRequirements: List<PasswordRequirement> = emptyList()
+    val passwordRequirements: List<PasswordRequirement> = emptyList(),
+//    val passwordRequirements: List<PasswordRequirement> = emptyList(),
 
     ){
 //    fun isFormValid(): Boolean {

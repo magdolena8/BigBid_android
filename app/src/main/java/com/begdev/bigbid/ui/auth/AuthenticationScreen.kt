@@ -12,16 +12,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.begdev.bigbid.R
 import com.begdev.bigbid.ui.theme.BigBidTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsWithImePadding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthenticationScreen(
+    navController: NavController,
     viewModel: AuthenticationViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(viewModel) {
+        viewModel.navigationEvent.collect { destination ->
+            navController.navigate(destination)
+        }
+    }
+
     Surface(
         Modifier
             .wrapContentHeight()
@@ -31,7 +41,8 @@ fun AuthenticationScreen(
             AuthenticationContent(
                 modifier = Modifier.fillMaxSize(),
                 authenticationState = viewModel.uiState.collectAsState().value,
-                handleEvent = viewModel::handleEvent
+                handleEvent = viewModel::handleEvent,
+                navController = navController
             )
         }
     }
@@ -44,8 +55,14 @@ fun AuthenticationContent(
     modifier: Modifier,
     authenticationState: AuthenticationState,
     handleEvent: (event: AuthenticationEvent) -> Unit,
+    navController: NavController
 
-    ) {
+) {
+//    LaunchedEffect(viewModel) {
+//        viewModel.navigationEvent.collect { destination ->
+//            navController.navigate(destination)
+//        }
+//    }
     AuthenticationForm(
         modifier = Modifier
             .fillMaxSize()
@@ -59,7 +76,9 @@ fun AuthenticationContent(
         onUsernameChanged = { handleEvent(AuthenticationEvent.UsernameChanged(it)) },
         onPasswordChanged = { handleEvent(AuthenticationEvent.PasswordChanged(it)) },
         onToggleMode = { handleEvent(AuthenticationEvent.ToggleAuthenticationMode) },
-        onAuthenticate = { handleEvent(AuthenticationEvent.Authenticate) }
+        onAuthenticate = { handleEvent(AuthenticationEvent.Authenticate) },
+        isLoggedIn = authenticationState.isSuccess,
+        navController = navController
     )
 }
 
@@ -75,8 +94,9 @@ fun AuthenticationForm(
     onUsernameChanged: (email: String) -> Unit,
     onPasswordChanged: (password: String) -> Unit,
     onToggleMode: () -> Unit,
-    onAuthenticate: () -> Unit
-
+    onAuthenticate: () -> Unit,
+    isLoggedIn: Boolean,
+    navController: NavController
 
 ) {
     ProvideWindowInsets {
@@ -112,8 +132,17 @@ fun AuthenticationForm(
                 password = password ?: "",
                 onPasswordChanged = onPasswordChanged
             )
+            val mainScope = CoroutineScope(Dispatchers.Main)
+
             Button(
-                onClick = onAuthenticate,
+                onClick = {
+//                    mainScope.launch {
+                        onAuthenticate()
+//                        if (isLoggedIn) {
+//                            navController.navigate("main")
+//                        }
+//                    }
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
@@ -155,6 +184,9 @@ fun AuthenticationForm(
             }
         }
     }
+//    if (isLoggedIn) {
+//        navController.navigate("main")
+//    }
 }
 
 @Composable
@@ -227,15 +259,7 @@ fun PasswordInput(
         singleLine = true,
         placeholder = { Text(stringResource(R.string.placeholder_password)) },
         visualTransformation = PasswordVisualTransformation()
-//        label = {
-//            Text(text = stringResource(id = R.string.label_password)
-//            )
-//        }
-//                leadingIcon = {
-//            Icon(
-//                imageVector = Icons.Default.Lock,
-//                contentDescription = null
-//            )
-//        }
     )
 }
+
+

@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import coil.transform.RoundedCornersTransformation
 import com.begdev.bigbid.data.api.ApiConstants
@@ -46,6 +47,7 @@ import com.begdev.bigbid.ui.theme.BigBidTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemScreen(
+    navController: NavController,
     viewModel: ItemViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -62,7 +64,6 @@ fun ItemScreen(
                         item = uiState.item,
                         bid = uiState.userBid,
                         onBidChanged = { viewModel.handleEvent(ItemEvent.UserBidChanged(it.toFloat())) },
-//                        onPlaceBid = {viewModel.handleEvent(ItemEvent.PlaceBid)}
                         onPlaceBid = { handleEvent(ItemEvent.PlaceBid) }
                     )
                 }
@@ -98,6 +99,9 @@ fun ItemScreenContent(
         Column(
             modifier = Modifier.padding(10.dp)
         ) {
+//            Button(onClick = { }) {
+//
+//            }
             Image(
                 painter = imagerPainter,
                 contentDescription = null,

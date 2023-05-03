@@ -9,7 +9,6 @@ import com.begdev.bigbid.data.api.model.Bid
 import com.begdev.bigbid.data.repository.BidsRepo
 import com.begdev.bigbid.data.repository.ItemsRepo
 import com.begdev.bigbid.data.repository.UsersRepo
-import com.begdev.bigbid.nav_utils.AppNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +21,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ItemViewModel @Inject constructor(
-    private val AppNavigator: AppNavigator,
     private val itemRepo: ItemsRepo,
     private val usersRepo: UsersRepo,
     private val bidsRepo: BidsRepo,
@@ -68,7 +66,6 @@ class ItemViewModel @Inject constructor(
             userBid = bid
         )
     }
-
     private fun placeBid() {
         viewModelScope.launch(Dispatchers.IO) {
             val currentDate = Calendar.getInstance().time
@@ -83,5 +80,4 @@ class ItemViewModel @Inject constructor(
             Log.d(TAG, "placeBid: response --> $response")
         }
     }
-
 }

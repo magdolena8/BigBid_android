@@ -15,28 +15,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.begdev.bigbid.nav_utils.Destination
-import com.begdev.bigbid.nav_utils.NavHost
-import com.begdev.bigbid.nav_utils.NavigationEffects
 import com.begdev.bigbid.nav_utils.Screen
-import com.begdev.bigbid.nav_utils.composable
-import com.begdev.bigbid.nav_utils.navigation
-import com.begdev.bigbid.ui.home.CatalogScreen
+import com.begdev.bigbid.ui.catalog.CatalogScreen
 import com.begdev.bigbid.ui.item.ItemScreen
 import com.begdev.bigbid.ui.profile.ProfileScreen
 import com.begdev.bigbid.ui.theme.BigBidTheme
 import com.google.accompanist.insets.navigationBarsWithImePadding
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun MainScreen(
+    navController: NavController,
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
@@ -45,10 +43,6 @@ fun MainScreen(
         Screen.Profile,
     )
 
-    NavigationEffects(
-        navigationChannel = mainViewModel.navigationChannel,
-        navHostController = navController
-    )
     BigBidTheme {
         Surface(
             modifier = Modifier
@@ -63,7 +57,7 @@ fun MainScreen(
                         items.forEach { screen ->
                             BottomNavigationItem(
                                 icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
-                                label = { Text(stringResource(screen.resourceId)) },
+                                label = { Text(stringResource(screen.resourceId!!)) },
                                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                 onClick = {
 
@@ -82,21 +76,24 @@ fun MainScreen(
             ) { innerPadding ->
                 NavHost(
                     navController = navController,
-                    startDestination = Destination.ProfileScreen,
+                    startDestination = Screen.Profile.route,
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    composable(destination = Destination.ItemScreen) {
-                        ItemScreen()
-                    }
-                    navigation(destination = Destination.MarketNavGraph, startDestination = Destination.CatalogScreen){
-                        composable(destination = Destination.CatalogScreen){
-                            CatalogScreen()
+
+                    navigation( route = Screen.Market.route, startDestination = Screen.Catalog.route) {
+                        composable(Screen.Catalog.route) {
+                            CatalogScreen(navController)
                         }
-                        composable(destination = Destination.ItemScreen){
-                            ItemScreen()
+                        composable(Screen.Item.route +"/{itemId}") {
+                            ItemScreen(navController)
                         }
                     }
-                    composable(destination = Destination.ProfileScreen){
+
+//                    composable(route = Screen.Market.route) {
+//                        CatalogScreen(navController)
+//                    }
+//
+                    composable(route = Screen.Profile.route) {
                         ProfileScreen()
                     }
                 }
