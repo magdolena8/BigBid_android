@@ -22,8 +22,8 @@ import com.begdev.bigbid.data.api.model.Item
 import com.begdev.bigbid.ui.theme.BigBidTheme
 
 @Composable
-fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel()
+fun CatalogScreen(
+    viewModel: MarketViewModel = hiltViewModel()
 ) {
     val itemState = viewModel.itemsState
     Surface(

@@ -16,6 +16,8 @@ sealed class Destination(protected val route: String, vararg params: String) {
 //    object RegisterScreen : NoArgumentsDestination("register")
     object HomeScreen : NoArgumentsDestination("home")
     object ProfileScreen : NoArgumentsDestination("profile")
+    object CatalogScreen : NoArgumentsDestination("catalog")
+    object MarketNavGraph : NoArgumentsDestination("market_graph")
 
 //    object RegisterScreen : Destination("register")
 

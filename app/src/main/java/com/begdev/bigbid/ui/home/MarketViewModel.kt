@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class MarketViewModel @Inject constructor(
     private val appNavigator: AppNavigator,
     private val itemsRepo: ItemsRepo
 ) : ViewModel() {

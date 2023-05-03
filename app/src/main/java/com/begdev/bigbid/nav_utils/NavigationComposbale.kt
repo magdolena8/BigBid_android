@@ -9,6 +9,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 
 @Composable
 fun NavHost(
@@ -38,5 +39,22 @@ fun NavGraphBuilder.composable(
         arguments = arguments,
         deepLinks = deepLinks,
         content = content
+    )
+}
+
+fun NavGraphBuilder.navigation(
+    destination: Destination,
+    startDestination: Destination,
+    arguments: List<NamedNavArgument> = emptyList(),
+    deepLinks: List<NavDeepLink> = emptyList(),
+    builder: NavGraphBuilder.() -> Unit
+
+) {
+    navigation(
+        startDestination = startDestination.fullRoute,
+        route = destination.fullRoute,
+        arguments = arguments,
+        deepLinks = deepLinks,
+        builder = builder
     )
 }
