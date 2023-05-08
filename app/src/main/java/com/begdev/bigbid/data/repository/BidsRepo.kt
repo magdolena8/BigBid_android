@@ -15,4 +15,12 @@ class BidsRepo @Inject constructor(
             null
         }
     }
+
+    suspend fun getBidsUser(userId: Int): List<Bid>? {
+        return try {
+            return bidsApi.getBidsUser(userId)
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.begdev.bigbid.ui.item
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,8 +13,6 @@ import com.begdev.bigbid.data.repository.UsersRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -28,14 +27,18 @@ class ItemViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ItemUiState())
-    val uiState: StateFlow<ItemUiState> = _uiState.asStateFlow()
+    val uiState = MutableStateFlow(ItemUiState())
+//    val uiState: StateFlow<ItemUiState> = _uiState.asStateFlow()
+//    val uiState1 = MutableStateFlow(ItemUiState())
 
     init {
         viewModelScope.launch {
             val itemId: String = checkNotNull(savedStateHandle["itemId"])
             val item = itemRepo.getItem(itemId.toInt())
-            _uiState.value = ItemUiState(item!!)
+            uiState.value = ItemUiState(mutableStateOf(item!!))
+//            uiState.value.copy(
+//                item.isLiked = true
+//            )
         }
     }
 
@@ -50,33 +53,66 @@ class ItemViewModel @Inject constructor(
                 updateUserBid(itemEvent.bid)
             }
 
-            is ItemEvent.AddToFavourite -> {
-//                addToFavourite(authenticationEvent.password)
+            is ItemEvent.ItemLikePressed -> {
+                changeLikeState()
             }
+
+            is ItemEvent.ItemUnliked -> {
+                unlikeItem()
+            }
+
 
             is ItemEvent.CurrentPriceChanged -> {
 //                updatePrice(itemEvent.newPrice)
 
             }
+
+            else -> {}
+        }
+    }
+
+    private fun changeLikeState() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response: Boolean? = if(uiState.value.item.value.isLiked != true){
+                itemRepo.likeItem(uiState.value.item.value.id!!, UsersRepo.currentUser?.id!!)
+            } else{
+                itemRepo.unlikeItem(uiState.value.item.value.id!!, UsersRepo.currentUser?.id!!)
+            }
+            if (response != null) {
+//                uiState.value.item.value = uiState
+                uiState.value.item.value.isLiked = !uiState.value.item.value.isLiked
+            }
+        }
+    }
+
+    private fun unlikeItem() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = itemRepo.unlikeItem(uiState.value.item.value.id!!, UsersRepo.currentUser?.id!!)
+            if (response != null) {
+//                uiState.value.item.value.copy(
+//
+//                )
+            }
         }
     }
 
     private fun updateUserBid(bid: Float) {
-        _uiState.value = uiState.value.copy(
+        uiState.value = uiState.value.copy(
             userBid = bid
         )
     }
+
     private fun placeBid() {
         viewModelScope.launch(Dispatchers.IO) {
             val currentDate = Calendar.getInstance().time
             val formattedDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(currentDate)
             val bid = Bid(
-                itemId = _uiState.value.item.id,
-                personId = usersRepo.currentUser?.id,
+                itemId = uiState.value.item.value.id,
+                personId = UsersRepo.currentUser?.id,
                 timeBid = formattedDate,
-                price = _uiState.value.userBid!!
+                price = uiState.value.userBid!!
             )
-            val response = bidsRepo.placeBid(bid, _uiState.value.item.id!!)
+            val response = bidsRepo.placeBid(bid, uiState.value.item.value.id!!)
             Log.d(TAG, "placeBid: response --> $response")
         }
     }

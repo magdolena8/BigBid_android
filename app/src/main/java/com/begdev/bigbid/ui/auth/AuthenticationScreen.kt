@@ -63,6 +63,7 @@ fun AuthenticationContent(
 //            navController.navigate(destination)
 //        }
 //    }
+
     AuthenticationForm(
         modifier = Modifier
             .fillMaxSize()

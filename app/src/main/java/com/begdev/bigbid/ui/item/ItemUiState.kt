@@ -1,10 +1,11 @@
 package com.begdev.bigbid.ui.item
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.begdev.bigbid.data.api.model.Item
 
 data class ItemUiState(
-    val item: Item = Item(12, "adqwd", "adqwd", "adqwd", 3.2f),
-    val isFavourite: Boolean = false,
-    val userBid: Float? = item.currentBid + 1,
+    val item: MutableState<Item> = mutableStateOf(Item(13, "adqwd", "adqwd", "adqwd", 3.2f)),
+    val userBid: Float? = item.value.currentBid + 1,
 
-)
+    )

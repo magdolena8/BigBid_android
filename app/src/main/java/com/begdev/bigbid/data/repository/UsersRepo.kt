@@ -12,8 +12,9 @@ import javax.inject.Inject
 class UsersRepo @Inject constructor(
     private val characterApi: AuthApi,
 ) {
-    var currentUser: Person? = Person(id = 1)
-
+    companion object {
+        var currentUser: Person? = Person(1)
+    }
 
     suspend fun loginUser(credentials: LoginCredentials): Response<Person> {
         val response = characterApi.loginUser(credentials)

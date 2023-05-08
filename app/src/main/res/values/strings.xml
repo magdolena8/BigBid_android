@@ -18,4 +18,13 @@
     <string name="market">Market</string>
     <string name="item">Item</string>
     <string name="main">Main</string>
+    <string name="favourite">Favourite</string>
+    <string name="owner">My goods</string>
+    <string name="liked">Liked</string>
+    <string name="bets">My Bids</string>
+    <string name="add_item">add</string>
+    <string name="placeholder_title">Title</string>
+    <string name="placeholder_description">Description</string>
+    <string name="placeholder_category">Category</string>
+    <string name="placeholder_start_price">Start Price</string>
 </resources>

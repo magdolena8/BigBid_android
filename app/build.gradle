@@ -88,6 +88,9 @@ dependencies {
 
     // coil
     implementation("io.coil-kt:coil-compose:1.4.0")
+
+//    implementation "androidx.compose.material:material:1.4.0-beta01"
+
 }
 
 kapt {

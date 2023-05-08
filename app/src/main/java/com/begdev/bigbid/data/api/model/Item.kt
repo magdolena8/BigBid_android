@@ -1,5 +1,6 @@
 package com.begdev.bigbid.data.api.model
 
+import com.begdev.bigbid.data.repository.ItemsRepo
 import com.google.gson.annotations.SerializedName
 
 data class Item(
@@ -33,7 +34,12 @@ data class Item(
     @field:SerializedName("auc_end_time")
     val auctionEndTime: String? = null,
 
-
-    ) {
-
+//    var isLiked: Boolean
+//    get() = ItemsRepo.likedItemsIds?.contains(id) == true
+) {
+    var isLiked: Boolean = false
+        get() = ItemsRepo.likedItemsIds.contains(id)
+        set(state: Boolean){
+            field = state
+        }
 }

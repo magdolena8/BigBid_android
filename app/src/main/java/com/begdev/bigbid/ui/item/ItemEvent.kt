@@ -14,5 +14,6 @@ sealed class ItemEvent {
 
 //    class PlaceBid (val newPrice:Float): ItemEvent()
     object PlaceBid: ItemEvent()
-    object AddToFavourite: ItemEvent()
+    object ItemLikePressed: ItemEvent()
+    object ItemUnliked: ItemEvent()
 }

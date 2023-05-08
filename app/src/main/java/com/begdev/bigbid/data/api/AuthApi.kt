@@ -15,4 +15,4 @@ interface AuthApi {
     @POST(ApiConstants.REGISTER_END_POINT)
     suspend fun registerUser(@Body credentials:RegisterCredentials): Response<Person>
 
-}
+} 

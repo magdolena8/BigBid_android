@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Surface
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -26,6 +24,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.begdev.bigbid.nav_utils.Screen
 import com.begdev.bigbid.ui.catalog.CatalogScreen
+import com.begdev.bigbid.ui.favourite.FavouriteScreen
 import com.begdev.bigbid.ui.item.ItemScreen
 import com.begdev.bigbid.ui.profile.ProfileScreen
 import com.begdev.bigbid.ui.theme.BigBidTheme
@@ -33,13 +32,14 @@ import com.google.accompanist.insets.navigationBarsWithImePadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(
+fun MainScreen (
     navController: NavController,
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
-    val items = listOf(
+    val bottomBarItems = listOf(
         Screen.Market,
+        Screen.Favourite,
         Screen.Profile,
     )
 
@@ -54,9 +54,9 @@ fun MainScreen(
                     BottomNavigation {
                         val navBackStackEntry by navController.currentBackStackEntryAsState()
                         val currentDestination = navBackStackEntry?.destination
-                        items.forEach { screen ->
+                        bottomBarItems.forEach { screen ->
                             BottomNavigationItem(
-                                icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                                icon = { Icon(screen.icon!!, contentDescription = null) },
                                 label = { Text(stringResource(screen.resourceId!!)) },
                                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                 onClick = {
@@ -89,10 +89,10 @@ fun MainScreen(
                         }
                     }
 
-//                    composable(route = Screen.Market.route) {
-//                        CatalogScreen(navController)
-//                    }
-//
+                    composable(route = Screen.Favourite.route) {
+                        FavouriteScreen()
+                    }
+
                     composable(route = Screen.Profile.route) {
                         ProfileScreen()
                     }

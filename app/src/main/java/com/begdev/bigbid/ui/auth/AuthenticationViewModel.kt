@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -100,16 +101,16 @@ class AuthenticationViewModel @Inject constructor(
                 )
 
             }
-        } else {
+        } else if (uiState.value.authenticationMode == AuthenticationMode.SIGN_IN) {
             viewModelScope.launch(Dispatchers.IO) {
                 loginPerson(uiState.value.email, md5(uiState.value.password))
 
-//            withContext(Dispatchers.Main) {
-//                uiState.value = uiState.value.copy(
-//                    isLoading = false,
-//                    error = "Something went wrong!"
-//                )
-//            }
+                withContext(Dispatchers.Main) {
+                    uiState.value = uiState.value.copy(
+                        isLoading = false,
+                        error = "Something went wrong!"
+                    )
+                }
             }
         }
     }
@@ -134,7 +135,6 @@ class AuthenticationViewModel @Inject constructor(
             navigateToHomeScreen()
         } else {
             loginError.value = true
-            Log.d(TAG, "loginPerson: ERRORRRRR")
         }
         Log.d(TAG, "loginPerson: ${response.body()}")
     }
@@ -157,6 +157,7 @@ class AuthenticationViewModel @Inject constructor(
             }
         }
     }
+
     private suspend fun navigateToHomeScreen() {
         _navigationEvent.emit(Screen.Main.route)
     }
