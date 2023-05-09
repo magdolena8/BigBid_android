@@ -31,7 +31,6 @@ import com.begdev.bigbid.R
 import com.begdev.bigbid.ui.owner.OwnerEvent
 import com.begdev.bigbid.ui.owner.OwnerViewModel
 import com.begdev.bigbid.ui.theme.BigBidTheme
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsWithImePadding
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +54,7 @@ fun AddItemScreen(viewModel: OwnerViewModel, navController: NavController) {
             .fillMaxSize()
             .navigationBarsWithImePadding()
     ) {
-        ProvideWindowInsets {
+//        ProvideWindowInsets {
             BigBidTheme {
 
                 Column(
@@ -69,8 +68,6 @@ fun AddItemScreen(viewModel: OwnerViewModel, navController: NavController) {
                     Button(onClick = { launcher.launch("image/*") }) {
                         Text(text = "Pick image")
                     }
-
-
                     newItemUiState.imageUri?.let { uri ->
                         val bitmap = if (Build.VERSION.SDK_INT < 28) {
                             MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
@@ -79,7 +76,11 @@ fun AddItemScreen(viewModel: OwnerViewModel, navController: NavController) {
                             ImageDecoder.decodeBitmap(source)
                         }
                         viewModel.updateBitmap(bitmap)
-                        Image(bitmap = bitmap.asImageBitmap(), contentDescription = null, modifier = Modifier.size(400.dp))
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier.size(100.dp)
+                        )
                     }
 
 
@@ -122,17 +123,17 @@ fun AddItemScreen(viewModel: OwnerViewModel, navController: NavController) {
                             viewModel.handleEvent(OwnerEvent.DurationChanged(duration.toInt()))
                         },
                         singleLine = true,
-                        placeholder = { Text(stringResource(R.string.placeholder_start_price)) },
+                        placeholder = { Text(stringResource(R.string.placeholder_duration)) },
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number
+                            keyboardType = KeyboardType.Decimal
                         )
                     )
 
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = { viewModel.handleEvent(OwnerEvent.AddButtonClicked())}) {
                         Text(text = "CREATE")
                     }
                 }
             }
-        }
+//        }
     }
 }

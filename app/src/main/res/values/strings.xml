@@ -27,4 +27,5 @@
     <string name="placeholder_description">Description</string>
     <string name="placeholder_category">Category</string>
     <string name="placeholder_start_price">Start Price</string>
+    <string name="placeholder_duration">Duration (days)</string>
 </resources>

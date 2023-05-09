@@ -8,7 +8,7 @@ data class AddItemUiState(
     val category: String = "",
     val description: String = "",
     val startPrice: Float = 0f,
-    val aucDuration: Int? = 1,
+    val aucDuration: Int = 1,
     val imageUri: Uri? = null,
     val bitmap: Bitmap? = null,
     ) {

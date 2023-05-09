@@ -19,4 +19,8 @@ sealed class OwnerEvent {
 
     class DurationChanged(val duration: Int) :
         OwnerEvent()
+
+    class AddButtonClicked() :
+        OwnerEvent()
+
 }
