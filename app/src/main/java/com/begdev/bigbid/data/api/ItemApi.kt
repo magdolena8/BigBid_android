@@ -15,7 +15,8 @@ import retrofit2.http.Query
 
 interface ItemApi {
     @GET(ApiConstants.CATALOG_END_POINT + "/{userId}")
-    suspend fun getItemsCatalog(@Path("userId") userId: Int): List<Item>
+    suspend fun getItemsCatalog(@Path("userId") userId: Int, @Query("filter") filter:String): List<Item>
+
 
     @GET(ApiConstants.OWNER_ITEMS_END_POINT + "/{userId}")
     suspend fun getItemsOwner(@Path("userId") userId: Int): List<Item>

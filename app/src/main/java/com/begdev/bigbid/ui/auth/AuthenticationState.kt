@@ -5,16 +5,17 @@ import com.begdev.bigbid.R
 
 data class AuthenticationState(
     val authenticationMode: AuthenticationMode = AuthenticationMode.SIGN_IN,
-    val email: String = "ivanbegan16@gmail.com",
-    val username: String = "ivanbegan",
+//    val email: String = "ivanbegan16@gmail.com",
+//    val username: String = "ivanbegan",
     val password: String = "qweqweqwe",
+    val email: String = "",
+    val username: String = "",
+//    val password: String = "",
     val repeatPassword: String = "",
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val error: String? = null,
     val passwordRequirements: List<PasswordRequirement> = emptyList(),
-//    val passwordRequirements: List<PasswordRequirement> = emptyList(),
-
     ){
 //    fun isFormValid(): Boolean {
 //        return password?.isNotEmpty() == true &&

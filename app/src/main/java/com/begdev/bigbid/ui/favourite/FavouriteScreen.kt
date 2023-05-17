@@ -24,7 +24,6 @@ fun FavouriteScreen(
 //    navController: NavController,
     viewModel: FavouriteViewModel = hiltViewModel()
 ) {
-
     TabScreen()
 }
 

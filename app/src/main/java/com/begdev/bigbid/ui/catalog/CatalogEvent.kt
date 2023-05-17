@@ -7,4 +7,12 @@ sealed class CatalogEvent{
 
     class ItemClicked(val item: Item):
         CatalogEvent()
+    class SearchQueryChanged(val queryString: String):
+        CatalogEvent()
+    class ToggleSearchState():
+        CatalogEvent()
+    class SearchItems():
+        CatalogEvent()
+    class RefreshItemsState():
+        CatalogEvent()
 }

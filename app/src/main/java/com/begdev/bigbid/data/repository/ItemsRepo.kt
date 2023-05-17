@@ -6,8 +6,10 @@ import android.util.Log
 import com.begdev.bigbid.data.DBHandlerLocal
 import com.begdev.bigbid.data.api.ItemApi
 import com.begdev.bigbid.data.api.model.Item
+import com.begdev.bigbid.utils.ConnectivityChecker
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -20,30 +22,56 @@ import javax.inject.Inject
 @OptIn(DelicateCoroutinesApi::class)
 class ItemsRepo @Inject constructor(
     private val itemsApi: ItemApi,
-    private val localDB: DBHandlerLocal
+    private val localDB: DBHandlerLocal,
+    private val connectivityChecker: ConnectivityChecker
 ) {
+    val isOnline: StateFlow<Boolean> = connectivityChecker.isOnline
+
+//    companion object {
+//        var likedItemsIds: MutableList<Int> by lazy {
+//            val list = mutableListOf<Int>()
+//
+//        }
+//    }
+
     companion object {
-        var likedItemsIds: MutableList<Int> = mutableListOf<Int>()
+        private lateinit var instance: ItemsRepo
+        val likedItemsIds: MutableList<Int> by lazy {
+            val list = mutableListOf<Int>()
+            GlobalScope.launch {
+                loadLikedItems(list, instance.localDB, instance.itemsApi, instance.isOnline.value)
+            }
+            list
+
+        }
     }
 
     init {
-        GlobalScope.launch {
-//            likedItemsIds = getItemsLiked(UsersRepo.currentUser?.id!!)?.map { it.id!! } as MutableList<Int>?
-            if (likedItemsIds.isEmpty()) {
-            }
-            val result =
-                getItemsLiked(UsersRepo.currentUser?.id!!)?.map { it.id!! } as MutableList<Int>?
-            if (result != null) {
-                result.forEach {
-//                    likedItemsIds?.add(it)
-                    localDB.addLikedItem(itemId = it)
-                    likedItemsIds.add(it)
-                }
-//                localDB.getLikedItemsIds()
-            }
-        }
-
+        instance = this
     }
+
+//    init {
+//        GlobalScope.launch {
+////            likedItemsIds = getItemsLiked(UsersRepo.currentUser?.id!!)?.map { it.id!! } as MutableList<Int>?
+//            if (likedItemsIds.isEmpty()) {
+//            }
+//            val result =
+//                getItemsLiked(UsersRepo.currentUser?.id!!)
+//            if (result != null) {
+//                result.forEach {
+////                    likedItemsIds?.add(it)
+//                    localDB.addLikedItem(
+//                        itemId = it.id!!,
+//                        title = it.title,
+//                        description = it.description,
+//                        category = it.category
+//                    )
+//                    likedItemsIds.add(it.id)
+//                }
+//            }
+//        }
+//    }
+
 
     suspend fun createLot(
         userId: Int,
@@ -62,7 +90,8 @@ class ItemsRepo @Inject constructor(
                     "image",
                     imageFile.name,
                     imageFile.asRequestBody()
-                ),                title = title.toRequestBody("text/plain".toMediaTypeOrNull()),
+                ),
+                title = title.toRequestBody("text/plain".toMediaTypeOrNull()),
                 category = category.toRequestBody("text/plain".toMediaTypeOrNull()),
                 description = description.toRequestBody("text/plain".toMediaTypeOrNull()),
                 startPrice = startPrice.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
@@ -76,7 +105,7 @@ class ItemsRepo @Inject constructor(
     }
 
     suspend fun uploadImage(imageFile: File): Boolean? {
-        Log.d(TAG, "uploadImage: "+ imageFile.totalSpace)
+        Log.d(TAG, "uploadImage: " + imageFile.totalSpace)
 
         return try {
             return itemsApi.uploadImage(
@@ -95,9 +124,9 @@ class ItemsRepo @Inject constructor(
         }
     }
 
-    suspend fun getItemsCatalog(userId: Int): List<Item>? {
+    suspend fun getItemsCatalog(userId: Int, filter: String): List<Item>? {
         return try {
-            return itemsApi.getItemsCatalog(userId)
+            return itemsApi.getItemsCatalog(userId, filter)
         } catch (e: Exception) {
             null
         }
@@ -105,7 +134,11 @@ class ItemsRepo @Inject constructor(
 
     suspend fun getItemsOwner(userId: Int): List<Item>? {
         return try {
-            return itemsApi.getItemsOwner(userId)
+            if (isOnline.value) {
+                val result = itemsApi.getItemsOwner(userId)
+                localDB.saveOwnerItems(result)
+                return result
+            } else localDB.getOwnerItemsList()
         } catch (e: Exception) {
             null
         }
@@ -113,7 +146,9 @@ class ItemsRepo @Inject constructor(
 
     suspend fun getItem(itemId: Int): Item? {
         return try {
-            itemsApi.getItem(itemId).takeIf { it.isSuccessful }?.body()
+            if (isOnline.value) {
+                return itemsApi.getItem(itemId).takeIf { it.isSuccessful }?.body()
+            } else return localDB.getOwnerItem(itemId)
         } catch (e: Exception) {
             null
         }
@@ -134,11 +169,17 @@ class ItemsRepo @Inject constructor(
 //            null
 //        }
 //    }
-    suspend fun likeItem(itemId: Int, userId: Int): Boolean? {
+    suspend fun likeItem(item: Item, userId: Int): Boolean? {
         return try {
-            val result = itemsApi.likeItem(mapOf("itemId" to itemId.toString()), userId)
+            val result = itemsApi.likeItem(mapOf("itemId" to item.id.toString()), userId)
             if (result == true) {
-                likedItemsIds?.add(itemId)
+                likedItemsIds?.add(item.id!!)
+                localDB.addLikedItem(
+                    itemId = item.id!!,
+                    title = item.title,
+                    description = item.description,
+                    category = item.category
+                )
             }
             return result
 
@@ -153,6 +194,7 @@ class ItemsRepo @Inject constructor(
             val result = itemsApi.unlikeItem(userId, itemId)
             if (result == true) {
                 likedItemsIds.remove(itemId)
+                localDB.unlikeItem(itemId)
             }
             return result
 
@@ -161,5 +203,30 @@ class ItemsRepo @Inject constructor(
             Log.d(TAG, "unlikeItem: " + e.message)
             null
         }
+    }
+}
+
+private suspend fun loadLikedItems(
+    list: MutableList<Int>,
+    localDB: DBHandlerLocal,
+    itemsApi: ItemApi,
+    isOnline: Boolean,
+) {
+    if (isOnline) {
+        val result = itemsApi.getItemsLiked(UsersRepo.currentUser?.id!!)
+        if (result != null) {
+            result.forEach {
+                localDB.addLikedItem(
+                    itemId = it.id!!,
+                    title = it.title,
+                    description = it.description,
+                    category = it.category
+                )
+                list.add(it.id)
+            }
+        }
+    }
+    else{
+        localDB.getLocalLikedItems()
     }
 }

@@ -17,7 +17,7 @@ data class Item(
     val photo: String? = null,
 
     @field:SerializedName("current_price")
-    val currentBid: Float = 0.0f,
+    val currentPrice: Float = 0.0f,
 
     @field:SerializedName("owner_id")
     val ownerId: Int? = null,
@@ -34,9 +34,7 @@ data class Item(
     @field:SerializedName("auc_end_time")
     val auctionEndTime: String? = null,
 
-//    var isLiked: Boolean
-//    get() = ItemsRepo.likedItemsIds?.contains(id) == true
-) {
+    ) {
     var isLiked: Boolean = false
         get() = ItemsRepo.likedItemsIds.contains(id)
         set(state: Boolean){

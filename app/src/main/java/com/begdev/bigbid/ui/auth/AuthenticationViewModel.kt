@@ -5,27 +5,34 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.begdev.bigbid.data.DBHandlerLocal
 import com.begdev.bigbid.data.api.model.LoginCredentials
 import com.begdev.bigbid.data.api.model.LoginType
 import com.begdev.bigbid.data.api.model.RegisterCredentials
 import com.begdev.bigbid.data.repository.UsersRepo
 import com.begdev.bigbid.nav_utils.Screen
+import com.begdev.bigbid.utils.ConnectivityChecker
 import com.begdev.bigbid.utils.md5
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-    private val usersRepo: UsersRepo
-
+    private val usersRepo: UsersRepo,
+    private val localDBHandler: DBHandlerLocal,
+    private val connectivityChecker: ConnectivityChecker
 ) : ViewModel() {
-    val uiState = MutableStateFlow(AuthenticationState())
+    val isOnline: StateFlow<Boolean> = connectivityChecker.isOnline
+
+    val uiState =
+        MutableStateFlow(AuthenticationState(email = usersRepo.getSavedCredentials().login.toString()))
     val isLoggedIn = mutableStateOf(false)
     val loginError = mutableStateOf(false)
 
@@ -99,7 +106,6 @@ class AuthenticationViewModel @Inject constructor(
                     uiState.value.username,
                     md5(uiState.value.password)
                 )
-
             }
         } else if (uiState.value.authenticationMode == AuthenticationMode.SIGN_IN) {
             viewModelScope.launch(Dispatchers.IO) {
@@ -126,17 +132,25 @@ class AuthenticationViewModel @Inject constructor(
         } else if (USERNAME_REGEX.toRegex().matches(login)) {
             credentials.loginType = LoginType.username
         }
-
-        val response = usersRepo.loginUser(credentials)
-        if (response.isSuccessful) {
-            uiState.value = uiState.value.copy(
-                isSuccess = true
-            )
-            navigateToHomeScreen()
-        } else {
-            loginError.value = true
+        if (isOnline.value) {
+            val response = usersRepo.loginUser(credentials)
+            if (response.isSuccessful) {
+                uiState.value = uiState.value.copy(
+                    isSuccess = true
+                )
+                navigateToHomeScreen()
+            } else {
+                loginError.value = true
+            }
+            Log.d(TAG, "loginPerson: ${response.body()}")
         }
-        Log.d(TAG, "loginPerson: ${response.body()}")
+        else{
+            val offlineLoginResult = localDBHandler.checkCredentialsOffline(login, passwordHash)
+            if(offlineLoginResult != null){
+                UsersRepo.currentUser = offlineLoginResult
+                navigateToHomeScreen()
+            }
+        }
     }
 
     suspend fun registerPerson(email: String, username: String, passwordHash: String) {
@@ -160,6 +174,10 @@ class AuthenticationViewModel @Inject constructor(
 
     private suspend fun navigateToHomeScreen() {
         _navigationEvent.emit(Screen.Main.route)
+    }
+
+    private fun saveUserToPrefs() {
+
     }
 
 }

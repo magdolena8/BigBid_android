@@ -14,15 +14,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -53,6 +48,16 @@ import com.begdev.bigbid.ui.theme.BigBidTheme
 fun LikedScreen(
     viewModel: LikedViewModel = hiltViewModel()
 ) {
+//    val navController = rememberNavController()
+    val eventHandler: (event: LikedEvent) -> Unit = viewModel::handleEvent
+
+//    LaunchedEffect(viewModel) {
+//        viewModel.navigationEvent.collect { destination ->
+//            navController.navigate(destination)
+//        }
+//    }
+
+
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val state = rememberPullRefreshState(isRefreshing, viewModel::refreshData)
 
@@ -65,7 +70,7 @@ fun LikedScreen(
         Box(
             Modifier
                 .pullRefresh(state)
-                .pullRefresh(state)) {
+        ) {//TODO: two pullRefresh(state) ??
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
                 if (itemsState.isEmpty()) {
                     item {
@@ -77,7 +82,9 @@ fun LikedScreen(
                     }
                 }
                 items(itemsState) { item: Item ->
-                    ItemImageCardLiked(item = item, onItemClick = { /*TODO*/ })
+                    ItemImageCardLiked(
+                        item = item,
+                        onItemClick = { eventHandler(LikedEvent.LikedItemClick(item)) })
 //                ItemImageCardOwner(item = item, onItemClick = { /*TODO*/})
                 }
             }
@@ -95,7 +102,7 @@ fun ItemImageCardLiked(
         12,
         "Exotic Book",
         photo = "https://assets1.ignimgs.com/thumbs/userUploaded/2022/6/14/tmntshreddersrevengeblogroll-01-1655243147003.jpg",
-        currentBid = 12.1F
+        currentPrice = 12.1F
     ),
     onItemClick: (Item) -> Unit
 ) {
@@ -134,19 +141,20 @@ fun ItemImageCardLiked(
                 )
                 var checked by remember { mutableStateOf(false) }
 
-                IconToggleButton(checked = checked, onCheckedChange = { checked = it }) {
-                    if (checked) {
-                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
-                    } else {
-                        Icon(Icons.Outlined.Favorite, contentDescription = "Localized description")
-                    }
-                }
+//                IconToggleButton(checked = checked, onCheckedChange = { checked = it }) {
+//                    if (checked) {
+//                        Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+//                    } else {
+//                        Icon(Icons.Outlined.Favorite, contentDescription = "Localized description")
+//                    }
+//                }
 
                 Text(
                     text = "${item.title}",
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 30.sp
                 )
+
                 Text(
                     text = "CURRENT BID",
                     color = MaterialTheme.colorScheme.primary,
@@ -154,13 +162,13 @@ fun ItemImageCardLiked(
                         fontSize = 10.sp,
                         color = MaterialTheme.colorScheme.secondary
                     )
-
                 )
                 Text(
-                    text = "${item.currentBid}",
+                    text = "${item.currentPrice}",
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 20.sp
                 )
+
             }
         }
     }

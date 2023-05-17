@@ -6,6 +6,6 @@ import com.begdev.bigbid.data.api.model.Item
 
 data class ItemUiState(
     val item: MutableState<Item> = mutableStateOf(Item(13, "adqwd", "adqwd", "adqwd", 3.2f)),
-    val userBid: Float? = item.value.currentBid + 1,
+    val userBid: Float? = item.value.currentPrice + 1,
 
     )

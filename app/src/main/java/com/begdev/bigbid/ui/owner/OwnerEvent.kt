@@ -1,5 +1,7 @@
 package com.begdev.bigbid.ui.owner
 
+import com.begdev.bigbid.data.api.model.Item
+
 sealed class OwnerEvent {
 
     class AddFABClicked() :
@@ -21,6 +23,8 @@ sealed class OwnerEvent {
         OwnerEvent()
 
     class AddButtonClicked() :
+        OwnerEvent()
+    class SaleItemClick(val item: Item) :
         OwnerEvent()
 
 }

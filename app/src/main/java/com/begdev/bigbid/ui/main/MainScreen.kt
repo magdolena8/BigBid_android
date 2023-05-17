@@ -9,9 +9,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -28,17 +31,22 @@ import com.begdev.bigbid.ui.favourite.FavouriteScreen
 import com.begdev.bigbid.ui.item.ItemScreen
 import com.begdev.bigbid.ui.profile.ProfileScreen
 import com.begdev.bigbid.ui.theme.BigBidTheme
-import com.google.accompanist.insets.navigationBarsWithImePadding
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen (
+fun MainScreen(
     navController: NavController,
-    mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
+//    private val connectivityChecker: ConnectivityChecker
+
 ) {
+    val isOnline by mainViewModel.isOnline.collectAsState()
+
+
     val navController = rememberNavController()
-    val bottomBarItems = listOf(
-        Screen.Market,
+    val bottomBarItems = listOfNotNull(
+        if (isOnline) Screen.Market else null,
         Screen.Favourite,
         Screen.Profile,
     )
@@ -46,10 +54,18 @@ fun MainScreen (
     BigBidTheme {
         Surface(
             modifier = Modifier
-                .fillMaxSize()
-                .navigationBarsWithImePadding(),
+                .fillMaxSize(),
         ) {
+
             Scaffold(
+                topBar = {
+                    if (!isOnline) TopAppBar(title = {
+                        Text(
+                            text = "OFFLINE MODE",
+                            color = Color.Red
+                        )
+                    })
+                },
                 bottomBar = {
                     BottomNavigation {
                         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -60,7 +76,6 @@ fun MainScreen (
                                 label = { Text(stringResource(screen.resourceId!!)) },
                                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                 onClick = {
-
                                     navController.navigate(screen.route) {
                                         popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
@@ -70,22 +85,28 @@ fun MainScreen (
                                     }
                                 }
                             )
+
                         }
                     }
                 }
             ) { innerPadding ->
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.Profile.route,
+                    startDestination = Screen.Favourite.route,
                     modifier = Modifier.padding(innerPadding)
                 ) {
 
-                    navigation( route = Screen.Market.route, startDestination = Screen.Catalog.route) {
+                    navigation(
+                        route = Screen.Market.route,
+                        startDestination = Screen.Catalog.route
+                    ) {
+//                        if(isOnline) {
                         composable(Screen.Catalog.route) {
                             CatalogScreen(navController)
                         }
-                        composable(Screen.Item.route +"/{itemId}") {
-                            ItemScreen(navController)
+//                        }
+                        composable(Screen.Item.route + "/{itemId}") {
+                            ItemScreen()
                         }
                     }
 
@@ -101,6 +122,5 @@ fun MainScreen (
         }
     }
 }
-
 
 

@@ -30,47 +30,54 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import coil.transform.RoundedCornersTransformation
 import com.begdev.bigbid.R
 import com.begdev.bigbid.data.api.ApiConstants
 import com.begdev.bigbid.data.api.model.Item
+import com.begdev.bigbid.data.repository.UsersRepo
 import com.begdev.bigbid.ui.theme.BigBidTheme
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.imePadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemScreen(
-    navController: NavController,
+//    navController: NavController,
     viewModel: ItemViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsState().value
     val handleEvent = viewModel::handleEvent
-    Surface(
-        Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
-    ) {
-        BigBidTheme {
-            Scaffold(
-                bottomBar = {
-                    BottomBidPanel(
+    ProvideWindowInsets {
+        Surface(
+            Modifier
+                .wrapContentHeight()
+                .fillMaxWidth()
+        ) {
+            BigBidTheme {
+                Scaffold(
+
+                    bottomBar = {
+                        if (uiState.item.value.ownerId != UsersRepo.currentUser?.id) {
+                            BottomBidPanel(
+                                item = uiState.item.value,
+                                bid = uiState.userBid,
+                                onBidChanged = { viewModel.handleEvent(ItemEvent.UserBidChanged(it.toFloat())) },
+                                onPlaceBid = { handleEvent(ItemEvent.PlaceBid) }
+                            )
+                        }
+                    }
+                ) { contentPadding ->
+                    ItemScreenContent(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(contentPadding),
                         item = uiState.item.value,
-                        bid = uiState.userBid,
-                        onBidChanged = { viewModel.handleEvent(ItemEvent.UserBidChanged(it.toFloat())) },
-                        onPlaceBid = { handleEvent(ItemEvent.PlaceBid) }
+                        isLiked = uiState.item.value.isLiked,
+                        onLikePressed = { viewModel.handleEvent(ItemEvent.ItemLikePressed) },
+//                    onUnlike = { viewModel.handleEvent(ItemEvent.ItemUnliked) }
                     )
                 }
-            ) { contentPadding ->
-                ItemScreenContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(contentPadding),
-                    item = uiState.item.value,
-                    isLiked =  uiState.item.value.isLiked,
-                    onLikePressed = { viewModel.handleEvent(ItemEvent.ItemLikePressed) },
-//                    onUnlike = { viewModel.handleEvent(ItemEvent.ItemUnliked) }
-                )
             }
         }
     }
@@ -79,11 +86,11 @@ fun ItemScreen(
 @Composable
 fun ItemScreenContent(
     modifier: Modifier = Modifier.padding(3.dp),
-    item: Item = Item(1, "Title name", "Description description", currentBid = 42.52f),
+    item: Item,
     isLiked: Boolean,
     onLikePressed: () -> Unit,
 //    onUnlike: () -> Unit,
-    ) {
+) {
 
     val imagerPainter = rememberImagePainter(
         data = ApiConstants.PHOTOS_END_POINT + item.photo,
@@ -98,7 +105,9 @@ fun ItemScreenContent(
     BigBidTheme(useDarkTheme = true) {
 
         Column(
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier
+                .padding(10.dp)
+//                .verticalScroll(rememberScrollState())
         ) {
             Image(
                 painter = imagerPainter,
@@ -115,21 +124,22 @@ fun ItemScreenContent(
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 10.sp
             )
-
-            IconToggleButton(checked = isLiked,
-                onCheckedChange = {
-                    onLikePressed()
-                }) {
-                if (isLiked) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_liked),
-                        contentDescription = "Localized description"
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_unliked),
-                        contentDescription = "Localized description"
-                    )
+            if (item.ownerId != UsersRepo.currentUser?.id) {
+                IconToggleButton(checked = isLiked,
+                    onCheckedChange = {
+                        onLikePressed()
+                    }) {
+                    if (isLiked) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_liked),
+                            contentDescription = "Localized description"
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_unliked),
+                            contentDescription = "Localized description"
+                        )
+                    }
                 }
             }
             Row(
@@ -142,7 +152,7 @@ fun ItemScreenContent(
                     fontSize = 30.sp
                 )
                 Text(
-                    text = "$${item.currentBid}",
+                    text = "$${item.currentPrice}",
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 30.sp
                 )
@@ -206,25 +216,6 @@ fun ItemScreenContent(
                     fontSize = 20.sp
                 )
             }
-
-
-//            Row {
-//                Text(
-//                    modifier = Modifier.padding(5.dp),
-//                    text = "CURRENT BID",
-//                    color = MaterialTheme.colorScheme.primary,
-//                    style = TextStyle(
-//                        fontSize = 10.sp,
-//                        color = MaterialTheme.colorScheme.secondary
-//                    )
-//                )
-//                Text(
-//                    text = "${item.currentBid}",
-//                    color = MaterialTheme.colorScheme.primary,
-//                    fontSize = 10.sp
-//                )
-//            }
-
             Divider(
                 color = Color.Gray,
                 thickness = 1.dp,
@@ -288,9 +279,10 @@ fun BottomBidPanel(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(horizontal = 12.dp),
+                    .padding(horizontal = 12.dp)
+                    .imePadding(),
                 item = item,
-                bid = bid ?: item.currentBid,
+                bid = bid ?: item.currentPrice,
                 onBidChanged = onBidChanged
             )
 
@@ -321,10 +313,9 @@ fun BidInput(
             onBidChanged(bid)
         },
         singleLine = true,
-        placeholder = { Text("More then" + item.currentBid.toString()) },
+        placeholder = { Text("More then" + item.currentPrice.toString()) },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Decimal
         )
-
     )
 }

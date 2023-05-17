@@ -28,20 +28,17 @@ class ItemViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState = MutableStateFlow(ItemUiState())
-//    val uiState: StateFlow<ItemUiState> = _uiState.asStateFlow()
-//    val uiState1 = MutableStateFlow(ItemUiState())
-
     init {
         viewModelScope.launch {
             val itemId: String = checkNotNull(savedStateHandle["itemId"])
             val item = itemRepo.getItem(itemId.toInt())
+            Log.d(TAG, "item : $item")
             uiState.value = ItemUiState(mutableStateOf(item!!))
 //            uiState.value.copy(
 //                item.isLiked = true
 //            )
         }
     }
-
 
     fun handleEvent(itemEvent: ItemEvent) {
         when (itemEvent) {
@@ -66,15 +63,13 @@ class ItemViewModel @Inject constructor(
 //                updatePrice(itemEvent.newPrice)
 
             }
-
-            else -> {}
         }
     }
 
     private fun changeLikeState() {
         viewModelScope.launch(Dispatchers.IO) {
             val response: Boolean? = if(uiState.value.item.value.isLiked != true){
-                itemRepo.likeItem(uiState.value.item.value.id!!, UsersRepo.currentUser?.id!!)
+                itemRepo.likeItem(uiState.value.item.value, UsersRepo.currentUser?.id!!)
             } else{
                 itemRepo.unlikeItem(uiState.value.item.value.id!!, UsersRepo.currentUser?.id!!)
             }

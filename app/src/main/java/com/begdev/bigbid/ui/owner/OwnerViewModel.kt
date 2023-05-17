@@ -12,12 +12,15 @@ import com.begdev.bigbid.data.api.model.Item
 import com.begdev.bigbid.data.repository.ItemsRepo
 import com.begdev.bigbid.data.repository.UsersRepo
 import com.begdev.bigbid.nav_utils.Screen
+import com.begdev.bigbid.nav_utils.appendParams
 import com.begdev.bigbid.ui.add_item.AddItemUiState
+import com.begdev.bigbid.utils.ConnectivityChecker
 import com.begdev.bigbid.utils.fileFromContentUri
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,7 +29,11 @@ import javax.inject.Inject
 class OwnerViewModel @Inject constructor(
     private val itemsRepo: ItemsRepo,
     private val application: Application,
+    private val connectivityChecker: ConnectivityChecker
 ) : ViewModel() {
+
+    val isOnline: StateFlow<Boolean> = connectivityChecker.isOnline
+
 
     private val _navigationEvent = MutableSharedFlow<String>()
     val navigationEvent: SharedFlow<String> = _navigationEvent
@@ -35,6 +42,9 @@ class OwnerViewModel @Inject constructor(
     val itemsState: List<Item> = _itemsState
 
     val newItemUiState = MutableStateFlow(AddItemUiState())
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
 
 
     init {
@@ -76,7 +86,12 @@ class OwnerViewModel @Inject constructor(
 
             is OwnerEvent.AddButtonClicked -> {
                 createLot()
-//                uploadImage()
+            }
+
+            is OwnerEvent.SaleItemClick -> {
+                viewModelScope.launch {
+                    navigateToItemScreen(ownerEvent.item)
+                }
             }
         }
     }
@@ -126,6 +141,7 @@ class OwnerViewModel @Inject constructor(
     private fun updateDescription(description: String) {
         newItemUiState.value = newItemUiState.value.copy(
             description = description
+        //todo: NULL в бд !!!!!!!!
         )
     }
 
@@ -141,9 +157,13 @@ class OwnerViewModel @Inject constructor(
         )
     }
 
-
     private suspend fun navigateToAddItemScreen() {
         val route = Screen.AddItem.route
+        _navigationEvent.emit(route)
+    }
+
+    private suspend fun navigateToItemScreen(item: Item) {
+        val route = Screen.Item.route.appendParams("ITEM_ID" to item.id)
         _navigationEvent.emit(route)
     }
 
@@ -158,4 +178,17 @@ class OwnerViewModel @Inject constructor(
             bitmap = bitmap
         )
     }
+
+    fun refreshData() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            val items = itemsRepo.getItemsOwner(UsersRepo.currentUser?.id!!)
+            if (items != null) {
+                _itemsState.clear()
+                _itemsState.addAll(items)
+            }
+            _isRefreshing.value = false
+        }
+    }
+
 }

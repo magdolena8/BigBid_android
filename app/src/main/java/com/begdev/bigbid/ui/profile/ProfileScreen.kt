@@ -24,28 +24,32 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
 import coil.transform.RoundedCornersTransformation
+import com.begdev.bigbid.R
 import com.begdev.bigbid.data.api.ApiConstants
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
 //    val uiState by viewModel.uiState.collectAsState()
 //    val handleEvent = viewModel::handleEvent
     val uiState by viewModel.uiState.collectAsState()
+    val isOnline by viewModel.isOnline.collectAsState()
 
     Surface(
         Modifier
             .wrapContentHeight()
             .fillMaxWidth()
     ) {
+
 
         Scaffold(
             topBar = {
@@ -58,11 +62,13 @@ fun ProfileScreen(
                         )
                     },
                     actions = {
-                        IconButton(onClick = { /* doSomething() */ }) {
-                            Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = null
-                            )
+                        if (isOnline) {
+                            IconButton(onClick = { /* doSomething() */ }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Edit,
+                                    contentDescription = null
+                                )
+                            }
                         }
                     }
                 )
@@ -76,9 +82,10 @@ fun ProfileScreen(
                                 RoundedCornersTransformation(30f),
                             )
                         })
+                    val offlineImagePainter = painterResource(id = R.drawable.offline_avatar)
                     Row {
                         Image(
-                            painter = imagerPainter,
+                            painter = if (isOnline) imagerPainter else offlineImagePainter,
                             contentDescription = null,
                             modifier = Modifier
                                 .weight(1f)
