@@ -1,5 +1,7 @@
 package com.begdev.bigbid.ui.owner
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -55,10 +57,10 @@ import com.begdev.bigbid.ui.add_item.AddItemScreen
 import com.begdev.bigbid.ui.item.ItemScreen
 import com.begdev.bigbid.ui.theme.BigBidTheme
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun OwnerScreen(
     viewModel: OwnerViewModel = hiltViewModel(),
-//    navController: NavController,
 ) {
 
     val navController = rememberNavController()
@@ -67,16 +69,23 @@ fun OwnerScreen(
             navController.navigate(destination)
         }
     }
-
-    NavHost(navController = navController, startDestination = Screen.Owner.route) {
-        composable(route = Screen.Owner.route) {
-            OwnerItemsScreen(viewModel, navController)
-        }
-        composable(route = Screen.AddItem.route) {
-            AddItemScreen(viewModel, navController)
-        }
-        composable(route = Screen.Item.route + "/{itemId}") {
-            ItemScreen()
+    Surface(
+        Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+    ) {
+        BigBidTheme {
+            NavHost(navController = navController, startDestination = Screen.Owner.route) {
+                composable(route = Screen.Owner.route) {
+                    OwnerItemsScreen(viewModel, navController)
+                }
+                composable(route = Screen.AddItem.route) {
+                    AddItemScreen(viewModel, navController)
+                }
+                composable(route = Screen.Item.route + "/{itemId}") {
+                    ItemScreen()
+                }
+            }
         }
     }
 }
@@ -96,31 +105,30 @@ fun OwnerItemsScreen(
     val state = rememberPullRefreshState(isRefreshing, viewModel::refreshData)
 
 
-    Surface(
-        Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
+    Surface{
+        BigBidTheme {
+
+
+    Scaffold(
+        floatingActionButton = {
+            if (isOnline) {
+                ExtendedFloatingActionButton(
+                    text = {
+                        Text(text = "Create lot", color = Color.White)
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Navigate FAB",
+                            tint = Color.White,
+                        )
+                    },
+                    onClick = { viewModel.handleEvent(OwnerEvent.AddFABClicked()) },
+                    containerColor = androidx.compose.material.MaterialTheme.colors.secondaryVariant,
+                )
+            }
+        },
     ) {
-        Scaffold(
-            floatingActionButton = {
-                if (isOnline) {
-                    ExtendedFloatingActionButton(
-                        text = {
-                            Text(text = "Create lot", color = Color.White)
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = "Navigate FAB",
-                                tint = Color.White,
-                            )
-                        },
-                        onClick = { viewModel.handleEvent(OwnerEvent.AddFABClicked()) },
-                        containerColor = androidx.compose.material.MaterialTheme.colors.secondaryVariant,
-                    )
-                }
-            },
-        ) {
             Box(Modifier.pullRefresh(state)) {
                 LazyColumn(
                     modifier = Modifier
@@ -144,7 +152,7 @@ fun OwnerItemsScreen(
                             }
 
                             else -> {
-                                {eventHandler(OwnerEvent.SaleItemClick(item))}
+                                { eventHandler(OwnerEvent.SaleItemClick(item)) }
                             }
                         }
                         )
@@ -152,8 +160,8 @@ fun OwnerItemsScreen(
                 }
                 PullRefreshIndicator(isRefreshing, state, Modifier.align(Alignment.TopCenter))
             }
-        }
     }
+}        }
 }
 
 
@@ -176,74 +184,74 @@ fun ItemImageCardOwner(
         })
 
 
-    BigBidTheme(useDarkTheme = true) {
-        Card(
-            //todo: elevation for card in home screen and everywhere
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 10.dp
-            ),
-            modifier = Modifier
-                .padding(3.dp)
-                .clickable { onItemClick() },
-            shape = RoundedCornerShape(10.dp),
+//    BigBidTheme{
+    Card(
+        //todo: elevation for card in home screen and everywhere
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 10.dp
+        ),
+        modifier = Modifier
+            .padding(3.dp)
+            .clickable { onItemClick() },
+        shape = RoundedCornerShape(10.dp),
+    ) {
+        Column(
+            modifier = Modifier.padding(10.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(10.dp)
-            ) {
-                Image(
-                    painter = imagerPainter,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(0.dp, 0.dp, 0.dp, 3.dp),
-                    contentScale = ContentScale.FillBounds
-                )
+            Image(
+                painter = imagerPainter,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(0.dp, 0.dp, 0.dp, 3.dp),
+                contentScale = ContentScale.FillBounds
+            )
 
+            Text(
+                text = "${item.title}",
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 30.sp
+            )
+            if (item.biddingCondition != "sail") {
                 Text(
-                    text = "${item.title}",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 30.sp
+                    text = "${item.biddingCondition}",
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    fontSize = 40.sp
                 )
-                if (item.biddingCondition != "sail") {
-                    Text(
-                        text = "${item.biddingCondition}",
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        fontSize = 40.sp
-                    )
-                    if (item.biddingCondition == "sold") {
-                        Row {
-                            Text(
-                                text = "Price",
-                                color = MaterialTheme.colorScheme.primary,
-                                style = TextStyle(
-                                    fontSize = 10.sp, color = MaterialTheme.colorScheme.secondary
-                                )
+                if (item.biddingCondition == "sold") {
+                    Row {
+                        Text(
+                            text = "Price",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = TextStyle(
+                                fontSize = 10.sp, color = MaterialTheme.colorScheme.secondary
+                            )
 
-                            )
-                            Text(
-                                text = "${item.currentPrice}",
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 20.sp
-                            )
-                        }
-                    }
-                } else {
-                    Text(
-                        text = "CURRENT BID",
-                        color = MaterialTheme.colorScheme.primary,
-                        style = TextStyle(
-                            fontSize = 10.sp, color = MaterialTheme.colorScheme.secondary
                         )
-
-                    )
-                    Text(
-                        text = "${item.currentPrice}",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 20.sp
-                    )
+                        Text(
+                            text = "${item.currentPrice}",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 20.sp
+                        )
+                    }
                 }
+            } else {
+                Text(
+                    text = "CURRENT BID",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = TextStyle(
+                        fontSize = 10.sp, color = MaterialTheme.colorScheme.secondary
+                    )
+
+                )
+                Text(
+                    text = "${item.currentPrice}",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 20.sp
+                )
             }
         }
+//        }
     }
 }

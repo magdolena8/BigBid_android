@@ -1,8 +1,11 @@
 package com.begdev.bigbid.ui.favourite
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -18,10 +21,10 @@ import com.begdev.bigbid.nav_utils.Screen
 import com.begdev.bigbid.ui.bids.BidsScreen
 import com.begdev.bigbid.ui.liked.LikedScreen
 import com.begdev.bigbid.ui.owner.OwnerScreen
+import com.begdev.bigbid.ui.theme.BigBidTheme
 
 @Composable
 fun FavouriteScreen(
-//    navController: NavController,
     viewModel: FavouriteViewModel = hiltViewModel()
 ) {
     TabScreen()
@@ -36,8 +39,11 @@ fun TabScreen() {
         Screen.Liked,
         Screen.Bets
     )
-
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Surface(        Modifier
+        .wrapContentHeight()
+        .fillMaxWidth()){
+//    BigBidTheme{
+            Column(modifier = Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = tabIndex) {
             tabs.forEachIndexed {index, screen ->
                 Tab(text = { Text(stringResource(screen.resourceId!!)) },
@@ -52,5 +58,5 @@ fun TabScreen() {
             1 -> LikedScreen()
             2 -> BidsScreen()
         }
-    }
+    }}
 }

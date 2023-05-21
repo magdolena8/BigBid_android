@@ -23,7 +23,8 @@ sealed class Screen(val route: String, @StringRes val resourceId: Int? = null, v
     object Catalog : Screen("catalog")
     object Favourite : Screen("favourite", R.string.favourite, icon = Icons.Filled.Favorite)
     object Owner : Screen("owner", R.string.owner, icon = Icons.Filled.AccountBox)
-    object Liked : Screen("liked", R.string.liked, icon = Icons.Filled.FavoriteBorder)
-    object Bets : Screen("liked", R.string.bets, icon = Icons.Filled.Done)
+    object Liked : Screen("liked_screen", R.string.liked, icon = Icons.Filled.FavoriteBorder)
+    object Bets : Screen("bets", R.string.bets, icon = Icons.Filled.Done)
     object AddItem : Screen("add_item", R.string.add_item, icon = Icons.Filled.Add)
+    object LikedItems : Screen("liked_items", R.string.add_item, icon = Icons.Filled.Add)
 }

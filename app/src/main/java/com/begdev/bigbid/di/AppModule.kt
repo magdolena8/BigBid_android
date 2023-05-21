@@ -16,6 +16,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
     @Singleton
     @Provides
     fun provideDBHandlerLocal(@ApplicationContext context: Context): DBHandlerLocal {

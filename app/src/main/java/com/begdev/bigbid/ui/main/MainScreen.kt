@@ -1,6 +1,7 @@
 package com.begdev.bigbid.ui.main
 
-import androidx.compose.foundation.layout.fillMaxSize
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -33,6 +34,7 @@ import com.begdev.bigbid.ui.profile.ProfileScreen
 import com.begdev.bigbid.ui.theme.BigBidTheme
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
@@ -51,12 +53,11 @@ fun MainScreen(
         Screen.Profile,
     )
 
-    BigBidTheme {
         Surface(
-            modifier = Modifier
-                .fillMaxSize(),
+//            modifier = Modifier
+//                .fillMaxSize(),
         ) {
-
+    BigBidTheme {
             Scaffold(
                 topBar = {
                     if (!isOnline) TopAppBar(title = {

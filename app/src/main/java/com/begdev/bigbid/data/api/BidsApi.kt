@@ -22,5 +22,11 @@ interface BidsApi {
     @GET(ApiConstants.BIDS_USER_END_POINT + "/{userId}")
     suspend fun getBidsUser(@Path("userId") userId: Int): List<Bid>
 
+    @GET(ApiConstants.BIDS_ITEM_END_POINT + "/{itemId}")
+    suspend fun getBidsItem(@Path("itemId") itemId: Int): List<Bid>
+    @GET(ApiConstants.BIDS_WINNER_END_POINT + "/{itemId}")
+    suspend fun getWinnerEmail(@Path("itemId") itemId: Int): String?
+
+
 
 }

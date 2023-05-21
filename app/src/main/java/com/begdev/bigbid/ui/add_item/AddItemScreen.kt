@@ -54,86 +54,84 @@ fun AddItemScreen(viewModel: OwnerViewModel, navController: NavController) {
             .fillMaxSize()
             .navigationBarsWithImePadding()
     ) {
-//        ProvideWindowInsets {
-            BigBidTheme {
-
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "Create Lot") //TODO: make text size bigger
+        BigBidTheme {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Create Lot") //TODO: make text size bigger
 
 
-                    Button(onClick = { launcher.launch("image/*") }) {
-                        Text(text = "Pick image")
+                Button(onClick = { launcher.launch("image/*") }) {
+                    Text(text = "Pick image")
+                }
+                newItemUiState.imageUri?.let { uri ->
+                    val bitmap = if (Build.VERSION.SDK_INT < 28) {
+                        MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                    } else {
+                        val source = ImageDecoder.createSource(context.contentResolver, uri)
+                        ImageDecoder.decodeBitmap(source)
                     }
-                    newItemUiState.imageUri?.let { uri ->
-                        val bitmap = if (Build.VERSION.SDK_INT < 28) {
-                            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-                        } else {
-                            val source = ImageDecoder.createSource(context.contentResolver, uri)
-                            ImageDecoder.decodeBitmap(source)
-                        }
-                        viewModel.updateBitmap(bitmap)
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = null,
-                            modifier = Modifier.size(100.dp)
-                        )
-                    }
-
-
-                    OutlinedTextField(value = newItemUiState.title ?: "",
-                        onValueChange = { title ->
-                            viewModel.handleEvent(OwnerEvent.TitleChanged(title))
-                        },
-                        singleLine = true,
-                        placeholder = { Text(stringResource(R.string.placeholder_title)) })
-
-                    OutlinedTextField(value = newItemUiState.category ?: "",
-                        onValueChange = { category ->
-                            viewModel.handleEvent(OwnerEvent.CategoryChanged(category))
-                        },
-                        singleLine = true,
-                        placeholder = { Text(stringResource(R.string.placeholder_category)) })
-
-                    OutlinedTextField(value = newItemUiState.description ?: "",
-                        onValueChange = { description ->
-                            viewModel.handleEvent(OwnerEvent.DescriptionChanged(description))
-                        },
-                        singleLine = true,
-                        placeholder = { Text(stringResource(R.string.placeholder_description)) })
-
-                    OutlinedTextField(
-                        value = newItemUiState.startPrice.toString() ?: "",
-                        onValueChange = { price ->
-                            viewModel.handleEvent(OwnerEvent.PriceChanged(price.toFloat()))
-                        },
-                        singleLine = true,
-                        placeholder = { Text(stringResource(R.string.placeholder_start_price)) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Decimal
-                        )
+                    viewModel.updateBitmap(bitmap)
+                    Image(
+                        bitmap = bitmap.asImageBitmap(),
+                        contentDescription = null,
+                        modifier = Modifier.size(100.dp)
                     )
+                }
 
-                    OutlinedTextField(
-                        value = newItemUiState.aucDuration.toString() ?: "",
-                        onValueChange = { duration ->
-                            viewModel.handleEvent(OwnerEvent.DurationChanged(duration.toInt()))
-                        },
-                        singleLine = true,
-                        placeholder = { Text(stringResource(R.string.placeholder_duration)) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Decimal
-                        )
+
+                OutlinedTextField(value = newItemUiState.title ?: "",
+                    onValueChange = { title ->
+                        viewModel.handleEvent(OwnerEvent.TitleChanged(title))
+                    },
+                    singleLine = true,
+                    placeholder = { Text(stringResource(R.string.placeholder_title)) })
+
+                OutlinedTextField(value = newItemUiState.category ?: "",
+                    onValueChange = { category ->
+                        viewModel.handleEvent(OwnerEvent.CategoryChanged(category))
+                    },
+                    singleLine = true,
+                    placeholder = { Text(stringResource(R.string.placeholder_category)) })
+
+                OutlinedTextField(value = newItemUiState.description ?: "",
+                    onValueChange = { description ->
+                        viewModel.handleEvent(OwnerEvent.DescriptionChanged(description))
+                    },
+                    singleLine = true,
+                    placeholder = { Text(stringResource(R.string.placeholder_description)) })
+
+                OutlinedTextField(
+                    value = newItemUiState.startPrice.toString() ?: "",
+                    onValueChange = { price ->
+                        viewModel.handleEvent(OwnerEvent.PriceChanged(price.toFloat()))
+                    },
+                    singleLine = true,
+                    placeholder = { Text(stringResource(R.string.placeholder_start_price)) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal
                     )
+                )
 
-                    Button(onClick = { viewModel.handleEvent(OwnerEvent.AddButtonClicked())}) {
-                        Text(text = "CREATE")
-                    }
+                OutlinedTextField(
+                    value = newItemUiState.aucDuration.toString() ?: "",
+                    onValueChange = { duration ->
+                        viewModel.handleEvent(OwnerEvent.DurationChanged(duration.toInt()))
+                    },
+                    singleLine = true,
+                    placeholder = { Text(stringResource(R.string.placeholder_duration)) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal
+                    )
+                )
+
+                Button(onClick = { viewModel.handleEvent(OwnerEvent.AddButtonClicked()) }) {
+                    Text(text = "CREATE")
                 }
             }
+        }
 //        }
     }
 }

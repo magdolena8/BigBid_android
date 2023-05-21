@@ -109,7 +109,6 @@ class ItemsRepo @Inject constructor(
 
         return try {
             return itemsApi.uploadImage(
-//                image = fbody,
                 image = MultipartBody.Part.createFormData(
                     "image",
                     imageFile.name,
@@ -148,15 +147,46 @@ class ItemsRepo @Inject constructor(
         return try {
             if (isOnline.value) {
                 return itemsApi.getItem(itemId).takeIf { it.isSuccessful }?.body()
-            } else return localDB.getOwnerItem(itemId)
+            } else {
+                if (likedItemsIds.contains(itemId))
+                    return localDB.getLikedItem(itemId)
+                else
+                    return localDB.getOwnerItem(itemId)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun getOwnerItem(itemId: Int): Item? {
+        return try {
+            if (isOnline.value) {
+                return itemsApi.getItem(itemId).takeIf { it.isSuccessful }?.body()
+            } else localDB.getOwnerItem(itemId)
         } catch (e: Exception) {
             null
         }
     }
 
+    suspend fun getLikedItem(itemId: Int): Item? {
+        return try {
+            if (isOnline.value) {
+                return itemsApi.getItem(itemId).takeIf { it.isSuccessful }?.body()
+            } else localDB.getLikedItem(itemId)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
     suspend fun getItemsLiked(userId: Int): List<Item>? {
         return try {
-            return itemsApi.getItemsLiked(userId)
+            if (isOnline.value) {
+                val result = itemsApi.getItemsLiked(userId)
+                localDB.saveLikedItems(result)
+                return result
+            } else localDB.getLikedItemsList()
         } catch (e: Exception) {
             null
         }
@@ -180,6 +210,7 @@ class ItemsRepo @Inject constructor(
                     description = item.description,
                     category = item.category
                 )
+                item.isLiked = true
             }
             return result
 
@@ -189,12 +220,13 @@ class ItemsRepo @Inject constructor(
         }
     }
 
-    suspend fun unlikeItem(itemId: Int, userId: Int): Boolean? {
+    suspend fun unlikeItem(item: Item, userId: Int): Boolean? {
         return try {
-            val result = itemsApi.unlikeItem(userId, itemId)
+            val result = itemsApi.unlikeItem(userId, item.id!!)
             if (result == true) {
-                likedItemsIds.remove(itemId)
-                localDB.unlikeItem(itemId)
+                likedItemsIds.remove(item.id)
+                localDB.unlikeItem(item.id!!)
+
             }
             return result
 
@@ -225,8 +257,7 @@ private suspend fun loadLikedItems(
                 list.add(it.id)
             }
         }
-    }
-    else{
-        localDB.getLocalLikedItems()
+    } else {
+        localDB.uploadLikedIdsFromLocal()
     }
 }

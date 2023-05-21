@@ -46,18 +46,16 @@ class LikedViewModel @Inject constructor(
                     navigateToItemScreen(likedEvent.item)
                 }
             }
-
-
         }
     }
 
     fun refreshData() {
         viewModelScope.launch {
             _isRefreshing.value = true
-            val bids = itemsRepo.getItemsLiked(UsersRepo.currentUser?.id!!)
-            if (bids != null) {
+            val items = itemsRepo.getItemsLiked(UsersRepo.currentUser?.id!!)
+            if (items != null) {
                 _itemsState.clear()
-                _itemsState.addAll(bids)
+                _itemsState.addAll(items)
             }
             _isRefreshing.value = false
         }
