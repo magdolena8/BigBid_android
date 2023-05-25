@@ -8,7 +8,10 @@ import com.begdev.bigbid.data.api.AuthApi
 import com.begdev.bigbid.data.api.model.LoginCredentials
 import com.begdev.bigbid.data.api.model.Person
 import com.begdev.bigbid.data.api.model.RegisterCredentials
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import java.io.File
 import javax.inject.Inject
 
 class UsersRepo @Inject constructor(
@@ -18,6 +21,21 @@ class UsersRepo @Inject constructor(
 ) {
     companion object {
         var currentUser: Person? = Person()
+    }
+
+    suspend fun editUser(username: String, imageFile: File): Boolean? {
+        return try {
+            return characterApi.editUser(
+                username = username,
+                image = MultipartBody.Part.createFormData(
+                "image",
+                imageFile.name,
+                imageFile.asRequestBody()
+            ))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 
     suspend fun loginUser(credentials: LoginCredentials): Response<Person> {

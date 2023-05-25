@@ -16,4 +16,5 @@ object ApiConstants {
     const val BIDS_USER_END_POINT = BASE_URL + "bids/user"
     const val BIDS_ITEM_END_POINT = BASE_URL + "bids/item"
     const val BIDS_WINNER_END_POINT = BASE_URL + "bids/winner"
+    const val EDIT_USER_END_POINT = BASE_URL + "users/update"
 }

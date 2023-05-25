@@ -1,6 +1,7 @@
 package com.begdev.bigbid.ui.auth
 
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -27,9 +28,14 @@ import javax.inject.Inject
 class AuthenticationViewModel @Inject constructor(
     private val usersRepo: UsersRepo,
     private val localDBHandler: DBHandlerLocal,
-    private val connectivityChecker: ConnectivityChecker
+    private val connectivityChecker: ConnectivityChecker,
+    context: Context
 ) : ViewModel() {
     val isOnline: StateFlow<Boolean> = connectivityChecker.isOnline
+
+    private val _toastEvent = MutableSharedFlow<String>(replay = 0)
+    val toastEvent: SharedFlow<String> = _toastEvent
+
 
     val uiState =
         MutableStateFlow(AuthenticationState(email = usersRepo.getSavedCredentials().login.toString()))
@@ -141,14 +147,23 @@ class AuthenticationViewModel @Inject constructor(
                 navigateToHomeScreen()
             } else {
                 loginError.value = true
+                viewModelScope.launch {
+                    _toastEvent.emit("Bad Credentials")
+                }
             }
             Log.d(TAG, "loginPerson: ${response.body()}")
-        }
-        else{
-            val offlineLoginResult = localDBHandler.checkCredentialsOffline(login, passwordHash)
-            if(offlineLoginResult != null){
-                UsersRepo.currentUser = offlineLoginResult
-                navigateToHomeScreen()
+        } else {
+            try {
+                val offlineLoginResult = localDBHandler.checkCredentialsOffline(login, passwordHash)
+                if (offlineLoginResult != null) {
+                    UsersRepo.currentUser = offlineLoginResult
+                    navigateToHomeScreen()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                viewModelScope.launch {
+                    _toastEvent.emit("Bad Credentials")
+                }
             }
         }
     }
@@ -165,9 +180,18 @@ class AuthenticationViewModel @Inject constructor(
                     isSuccess = true
                 )
                 navigateToHomeScreen()
+
             } else {
+                viewModelScope.launch {
+                    _toastEvent.emit("Register Error\nCheck credentials")
+                }
                 loginError.value = true
                 Log.d(TAG, "registerPerson: ERRORRRRR")
+            }
+        }
+        else{
+            viewModelScope.launch {
+                _toastEvent.emit("Bad Credentials")
             }
         }
     }

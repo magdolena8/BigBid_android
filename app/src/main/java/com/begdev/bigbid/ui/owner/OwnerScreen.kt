@@ -105,63 +105,74 @@ fun OwnerItemsScreen(
     val state = rememberPullRefreshState(isRefreshing, viewModel::refreshData)
 
 
-    Surface{
+    Surface {
         BigBidTheme {
-
-
-    Scaffold(
-        floatingActionButton = {
-            if (isOnline) {
-                ExtendedFloatingActionButton(
-                    text = {
-                        Text(text = "Create lot", color = Color.White)
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Navigate FAB",
-                            tint = Color.White,
+            Scaffold(
+                floatingActionButton = {
+                    if (isOnline) {
+                        ExtendedFloatingActionButton(
+                            text = {
+                                Text(text = "Create lot", color = Color.White)
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Filled.Add,
+                                    contentDescription = "Navigate FAB",
+                                    tint = Color.White,
+                                )
+                            },
+                            onClick = { viewModel.handleEvent(OwnerEvent.AddFABClicked()) },
+                            containerColor = androidx.compose.material.MaterialTheme.colors.secondaryVariant,
                         )
-                    },
-                    onClick = { viewModel.handleEvent(OwnerEvent.AddFABClicked()) },
-                    containerColor = androidx.compose.material.MaterialTheme.colors.secondaryVariant,
-                )
-            }
-        },
-    ) {
-            Box(Modifier.pullRefresh(state)) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(it)
-                ) {
-                    if (itemsState.isEmpty()) {
-                        item {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .wrapContentSize(align = Alignment.Center)
+                    }
+                },
+            ) {
+                Box(Modifier.pullRefresh(state)) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(it)
+                    ) {
+                        if (viewModel.isRefreshing.value) {
+                            item {
+                                CircularProgressIndicator(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .wrapContentSize(align = Alignment.Center)
+                                )
+                            }
+                        }
+                        if (itemsState.isEmpty()) {
+                            item {
+                                Text(
+                                    text = "Nothing here yet",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .fillMaxSize()
+                                        .align(Alignment.Center)
+                                )
+                            }
+                        }
+                        items(itemsState) { item: Item ->
+                            ItemImageCardOwner(item = item, onItemClick =
+                            when (item.biddingCondition) {
+                                "sale" -> {
+                                    { eventHandler(OwnerEvent.SaleItemClick(item)) }
+                                }
+
+                                else -> {
+                                    { eventHandler(OwnerEvent.SaleItemClick(item)) }
+                                }
+                            }
                             )
                         }
                     }
-                    items(itemsState) { item: Item ->
-                        ItemImageCardOwner(item = item, onItemClick =
-                        when (item.biddingCondition) {
-                            "sale" -> {
-                                { eventHandler(OwnerEvent.SaleItemClick(item)) }
-                            }
-
-                            else -> {
-                                { eventHandler(OwnerEvent.SaleItemClick(item)) }
-                            }
-                        }
-                        )
-                    }
+                    PullRefreshIndicator(isRefreshing, state, Modifier.align(Alignment.TopCenter))
                 }
-                PullRefreshIndicator(isRefreshing, state, Modifier.align(Alignment.TopCenter))
             }
+        }
     }
-}        }
 }
 
 

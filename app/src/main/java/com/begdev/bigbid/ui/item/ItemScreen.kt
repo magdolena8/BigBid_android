@@ -37,6 +37,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -79,6 +80,13 @@ fun ItemScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val refreshState = rememberPullRefreshState(isRefreshing, viewModel::refreshData)
     val winnerEmail = viewModel.winnerEmail.collectAsState()
+    val context = LocalContext.current
+    LaunchedEffect(viewModel.toastEvent) {
+        viewModel.toastEvent.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
     ProvideWindowInsets {
         Surface(
             Modifier
@@ -88,7 +96,7 @@ fun ItemScreen(
             BigBidTheme {
                 Scaffold(
                     bottomBar = {
-                        if ((uiState.item.value.ownerId != UsersRepo.currentUser?.id) and isOnline) {
+                        if ((uiState.item.value.ownerId != UsersRepo.currentUser?.id) and isOnline and isOnline and (uiState.item.value.biddingCondition != "sold")) {
                             BottomBidPanel(
                                 item = uiState.item.value,
                                 bid = uiState.userBid,
@@ -162,7 +170,7 @@ fun ItemScreenContent(
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 10.sp
                 )
-                if ((item.ownerId != UsersRepo.currentUser?.id) and isOnline) {
+                if ((item.ownerId != UsersRepo.currentUser?.id) and isOnline and (item.biddingCondition != "sold")) {
                     IconToggleButton(checked = isLiked,
                         onCheckedChange = {
                             onLikePressed()

@@ -33,7 +33,8 @@ class OwnerViewModel @Inject constructor(
 ) : ViewModel() {
 
     val isOnline: StateFlow<Boolean> = connectivityChecker.isOnline
-
+    private val _toastEvent = MutableSharedFlow<String>(replay = 0)
+    val toastEvent: SharedFlow<String> = _toastEvent
 
     private val _navigationEvent = MutableSharedFlow<String>()
     val navigationEvent: SharedFlow<String> = _navigationEvent
@@ -86,6 +87,7 @@ class OwnerViewModel @Inject constructor(
 
             is OwnerEvent.AddButtonClicked -> {
                 createLot()
+                refreshData()
             }
 
             is OwnerEvent.SaleItemClick -> {
@@ -97,6 +99,7 @@ class OwnerViewModel @Inject constructor(
     }
 
     private fun createLot() {
+        try{
         viewModelScope.launch {
             val result = itemsRepo.createLot(
                 userId = UsersRepo.currentUser?.id!!,
@@ -109,19 +112,18 @@ class OwnerViewModel @Inject constructor(
                 imageUri = newItemUiState.value.imageUri!!
             )
             if (result == true) {
+                val route = Screen.Owner.route
+                _navigationEvent.emit(route)
+                viewModelScope.launch {
+                    _toastEvent.emit("New Lot Created!")
+                }
                 Log.d(TAG, "createLot: SECCESS")
             }
-        }
-    }
-
-    private fun uploadImage() {
-        viewModelScope.launch {
-            val uri = newItemUiState.value.imageUri
-            val result = itemsRepo.uploadImage(
-                imageFile = fileFromContentUri(application, uri!!)
-            )
-            if (result == true) {
-                Log.d(TAG, "createLot: SECCESS")
+        }}
+        catch (e:Exception){
+            e.printStackTrace()
+            viewModelScope.launch {
+                _toastEvent.emit("Check lot fields")
             }
         }
     }

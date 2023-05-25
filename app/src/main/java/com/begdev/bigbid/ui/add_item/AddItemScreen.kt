@@ -4,6 +4,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -18,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,9 +40,12 @@ import com.google.accompanist.insets.navigationBarsWithImePadding
 fun AddItemScreen(viewModel: OwnerViewModel, navController: NavController) {
     val uiState = viewModel.itemsState
     val newItemUiState = viewModel.newItemUiState.collectAsState().value
-
-
     val context = LocalContext.current
+    LaunchedEffect(viewModel.toastEvent) {
+        viewModel.toastEvent.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        }
+    }
     val launcher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent()

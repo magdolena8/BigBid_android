@@ -2,12 +2,14 @@ package com.begdev.bigbid.ui.auth
 
 //import com.google.accompanist.insets.navigationBarsWithImePadding
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -26,9 +28,17 @@ fun AuthenticationScreen(
     navController: NavController,
     viewModel: AuthenticationViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val isOnline by viewModel.isOnline.collectAsState()
+
     LaunchedEffect(viewModel) {
         viewModel.navigationEvent.collect { destination ->
             navController.navigate(destination)
+        }
+    }
+    LaunchedEffect(viewModel.toastEvent) {
+        viewModel.toastEvent.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -42,7 +52,8 @@ fun AuthenticationScreen(
                 modifier = Modifier.fillMaxSize(),
                 authenticationState = viewModel.uiState.collectAsState().value,
                 handleEvent = viewModel::handleEvent,
-                navController = navController
+                navController = navController,
+                isOnline = isOnline
             )
         }
     }
@@ -55,8 +66,8 @@ fun AuthenticationContent(
     modifier: Modifier,
     authenticationState: AuthenticationState,
     handleEvent: (event: AuthenticationEvent) -> Unit,
-    navController: NavController
-
+    navController: NavController,
+    isOnline: Boolean
 ) {
 //    LaunchedEffect(viewModel) {
 //        viewModel.navigationEvent.collect { destination ->
@@ -79,7 +90,8 @@ fun AuthenticationContent(
         onToggleMode = { handleEvent(AuthenticationEvent.ToggleAuthenticationMode) },
         onAuthenticate = { handleEvent(AuthenticationEvent.Authenticate) },
         isLoggedIn = authenticationState.isSuccess,
-        navController = navController
+        navController = navController,
+        isOnline = isOnline
     )
 }
 
@@ -97,7 +109,8 @@ fun AuthenticationForm(
     onToggleMode: () -> Unit,
     onAuthenticate: () -> Unit,
     isLoggedIn: Boolean,
-    navController: NavController
+    navController: NavController,
+    isOnline: Boolean
 
 ) {
     ProvideWindowInsets {
@@ -161,6 +174,7 @@ fun AuthenticationForm(
                 thickness = 1.dp,
                 modifier = Modifier.padding(top = 100.dp)
             )
+            if(isOnline){
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(
@@ -182,7 +196,7 @@ fun AuthenticationForm(
                         )
                     )
                 }
-            }
+            }}
         }
     }
 //    if (isLoggedIn) {

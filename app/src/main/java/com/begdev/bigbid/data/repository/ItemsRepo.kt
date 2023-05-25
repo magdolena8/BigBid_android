@@ -26,14 +26,6 @@ class ItemsRepo @Inject constructor(
     private val connectivityChecker: ConnectivityChecker
 ) {
     val isOnline: StateFlow<Boolean> = connectivityChecker.isOnline
-
-//    companion object {
-//        var likedItemsIds: MutableList<Int> by lazy {
-//            val list = mutableListOf<Int>()
-//
-//        }
-//    }
-
     companion object {
         private lateinit var instance: ItemsRepo
         val likedItemsIds: MutableList<Int> by lazy {
@@ -49,30 +41,6 @@ class ItemsRepo @Inject constructor(
     init {
         instance = this
     }
-
-//    init {
-//        GlobalScope.launch {
-////            likedItemsIds = getItemsLiked(UsersRepo.currentUser?.id!!)?.map { it.id!! } as MutableList<Int>?
-//            if (likedItemsIds.isEmpty()) {
-//            }
-//            val result =
-//                getItemsLiked(UsersRepo.currentUser?.id!!)
-//            if (result != null) {
-//                result.forEach {
-////                    likedItemsIds?.add(it)
-//                    localDB.addLikedItem(
-//                        itemId = it.id!!,
-//                        title = it.title,
-//                        description = it.description,
-//                        category = it.category
-//                    )
-//                    likedItemsIds.add(it.id)
-//                }
-//            }
-//        }
-//    }
-
-
     suspend fun createLot(
         userId: Int,
         imageFile: File,
@@ -93,13 +61,14 @@ class ItemsRepo @Inject constructor(
                 ),
                 title = title.toRequestBody("text/plain".toMediaTypeOrNull()),
                 category = category.toRequestBody("text/plain".toMediaTypeOrNull()),
-                description = description.toRequestBody("text/plain".toMediaTypeOrNull()),
+                description = description.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
                 startPrice = startPrice.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
                 aucDuration = aucDuration.toString()
                     .toRequestBody("text/plain".toMediaTypeOrNull()),
                 imageUri = imageUri.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-            )
+            ).isSuccessful
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }

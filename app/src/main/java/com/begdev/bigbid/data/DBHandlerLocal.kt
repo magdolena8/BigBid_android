@@ -101,7 +101,7 @@ class DBHandlerLocal
         val db = this.readableDatabase
         val bids = mutableListOf<Bid>()
         val cursor = db.rawQuery(
-            "SELECT * FROM ${BIDS_TABLE_NAME} WHERE ${ITEM_ID_COL} = ${itemId}", null
+            "SELECT * FROM ${BIDS_TABLE_NAME} WHERE ${ITEM_ID_COL} = ${itemId} order by ${TIME_BID_COL} desc", null
         )
         with(cursor) {
             while (moveToNext()) {
@@ -140,8 +140,6 @@ class DBHandlerLocal
                 val bidderUsername = getString(getColumnIndexOrThrow(BIDDER_USERNAME_COL))
                 val timeBid = getString(getColumnIndexOrThrow(TIME_BID_COL))
                 val price = getFloat(getColumnIndexOrThrow(PRICE_COL))
-//                val photo = getString(getColumnIndexOrThrow(PHOTO_COL))
-//                val biddingCondition = getString(getColumnIndexOrThrow(BIDDING_COND_COL))
                 val bid =
                     Bid(
                         id = id,
@@ -291,7 +289,8 @@ class DBHandlerLocal
         val accountType = cursor.getString(cursor.getColumnIndexOrThrow(USERNAME_COL))
         cursor.close()
 //        cursor.getInt(cursor.getColumnIndexOrThrow(USERID_COL))
-        return Person(id = userId, email = email, username = username, accountType = accountType)
+        var person = Person(id = userId, email = email, username = username, accountType = accountType)
+        return person;
 
     }
 
@@ -307,6 +306,10 @@ class DBHandlerLocal
 //            Age.append(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)) + "\n")
         }
         cursor.close()
+    }
+
+    fun clearDatabase(){
+
     }
 
     fun getLikedItemsList(): List<Item> {
@@ -381,14 +384,9 @@ class DBHandlerLocal
         private const val USER_TABLE_NAME = "user"
         private const val OWNER_TABLE_NAME = "owner"
         private const val BIDS_TABLE_NAME = "bids"
-
-        //        private const val ID_COL = "item_id"
         private const val TITLE_COL = "title"
         private const val DESCRIPTION_COL = "description"
         private const val CATEGORY_COL = "category"
-
-        //        private const val CURENT_PRICE = "price"
-        private const val FAV_STATE_COL = "fav_state"
         private const val USERID_COL = "user_id"
         private const val EMAIL_COL = "email"
         private const val USERNAME_COL = "username"
@@ -402,6 +400,5 @@ class DBHandlerLocal
         private const val PRICE_COL = "price"
         private const val PHOTO_COL = "photo"
         private const val BIDDING_COND_COL = "bidding_cond"
-//        private const val TRACKS_COL = "tracks"
     }
 }

@@ -101,11 +101,9 @@ fun MainScreen(
                         route = Screen.Market.route,
                         startDestination = Screen.Catalog.route
                     ) {
-//                        if(isOnline) {
                         composable(Screen.Catalog.route) {
                             CatalogScreen(navController)
                         }
-//                        }
                         composable(Screen.Item.route + "/{itemId}") {
                             ItemScreen()
                         }

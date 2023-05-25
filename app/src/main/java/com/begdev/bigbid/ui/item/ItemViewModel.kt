@@ -16,7 +16,9 @@ import com.begdev.bigbid.data.repository.UsersRepo
 import com.begdev.bigbid.utils.ConnectivityChecker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -41,7 +43,8 @@ class ItemViewModel @Inject constructor(
     val isRefreshing: StateFlow<Boolean> = _isRefreshing
     private val _winnerEmail = MutableStateFlow("")
     val winnerEmail: StateFlow<String> = _winnerEmail
-
+    private val _toastEvent = MutableSharedFlow<String>(replay = 0)
+    val toastEvent: SharedFlow<String> = _toastEvent
 
     init {
         viewModelScope.launch {
@@ -168,6 +171,16 @@ class ItemViewModel @Inject constructor(
                 price = uiState.value.userBid!!
             )
             val response = bidsRepo.placeBid(bid, uiState.value.item.value.id!!)
+            if (response != null) {
+                viewModelScope.launch {
+                    _toastEvent.emit("Bid Placed")
+                }
+            }
+            else{
+                viewModelScope.launch {
+                    _toastEvent.emit("Error")
+                }
+            }
             Log.d(TAG, "placeBid: response --> $response")
         }
     }

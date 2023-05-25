@@ -1,7 +1,13 @@
 package com.begdev.bigbid.ui.profile
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,10 +30,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
 import coil.transform.RoundedCornersTransformation
@@ -43,14 +53,19 @@ fun ProfileScreen(
 //    val handleEvent = viewModel::handleEvent
     val uiState by viewModel.uiState.collectAsState()
     val isOnline by viewModel.isOnline.collectAsState()
-
+    var bitmap: Bitmap? = null
+    val context = LocalContext.current
+    val launcher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            viewModel.updateImageUri(uri)
+        }
     Surface(
         Modifier
             .wrapContentHeight()
             .fillMaxWidth()
     ) {
-
-
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -62,8 +77,8 @@ fun ProfileScreen(
                         )
                     },
                     actions = {
-                        if (isOnline) {
-                            IconButton(onClick = { /* doSomething() */ }) {
+                        if (isOnline && (uiState.profileMode == EditMode.NO_EDIT)) {
+                            IconButton(onClick = { viewModel.handleEvent(ProfileEvent.ToggleEditMode) }) {
                                 Icon(
                                     imageVector = Icons.Filled.Edit,
                                     contentDescription = null
@@ -74,74 +89,87 @@ fun ProfileScreen(
                 )
             },
             content = { innerPadding ->
-                Column(modifier = Modifier.padding(innerPadding)) {
-                    val imagerPainter = rememberImagePainter(
-                        data = ApiConstants.AVATAR_END_POINT + uiState.person?.avatar,
-                        builder = {
-                            transformations(
-                                RoundedCornersTransformation(30f),
-                            )
-                        })
-                    val offlineImagePainter = painterResource(id = R.drawable.offline_avatar)
-                    Row {
-                        Image(
-                            painter = if (isOnline) imagerPainter else offlineImagePainter,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(200.dp)
-                                .padding(0.dp, 0.dp, 0.dp, 3.dp),
-                            contentScale = ContentScale.FillBounds,
-                        )
-                        Column(modifier = Modifier.weight(2f)) {
-                            Row() {
-                                Text(modifier = Modifier.weight(2f), text = "Email")
-                                Text(modifier = Modifier.weight(2f), text = uiState.person?.email!!)
+                Column {
+
+                    Row(modifier = Modifier.padding(innerPadding)) {
+                        val imagerPainter = rememberImagePainter(
+                            data = ApiConstants.AVATAR_END_POINT + uiState.person!!.username,
+                            builder = {
+                                transformations(
+                                    RoundedCornersTransformation(30f),
+                                )
+                            })
+                        val offlineImagePainter = painterResource(id = R.drawable.offline_avatar)
+                        Row(modifier = Modifier.padding(0.dp, 0.dp, 5.dp, 5.dp)) {
+                            Column(Modifier.weight(1f).padding(8.dp)) {
+                                if (uiState.bitmap == null) {
+                                    Image(
+                                        painter = imagerPainter,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .height(100.dp)
+                                            .padding(0.dp, 0.dp, 0.dp, 3.dp),
+                                        contentScale = ContentScale.FillBounds,
+                                    )
+                                } else {
+                                    bitmap?.let {
+                                        Image(
+                                            bitmap = it.asImageBitmap(),
+                                            contentDescription = null,
+                                            modifier = Modifier
+                                                .height(100.dp)
+                                                .padding(0.dp, 0.dp, 0.dp, 3.dp),
+                                            contentScale = ContentScale.FillBounds,
+                                        )
+                                    }
+                                }
+                                if (uiState.profileMode == EditMode.EDIT) {
+                                    Button(onClick = { launcher.launch("image/*") }) {
+                                        Text("CHANGE AVATAR")
+                                    }
+                                }
+                                uiState.imageUri?.let { uri ->
+                                    bitmap = if (Build.VERSION.SDK_INT < 28) {
+                                        MediaStore.Images.Media.getBitmap(
+                                            context.contentResolver,
+                                            uri
+                                        )
+                                    } else {
+                                        val source =
+                                            ImageDecoder.createSource(context.contentResolver, uri)
+                                        ImageDecoder.decodeBitmap(source)
+                                    }
+                                    viewModel.updateBitmap(bitmap)
+
+                                }
                             }
-                            Row() {
-                                Text(modifier = Modifier.weight(2f), text = "Privilege")
+                            Column(modifier = Modifier.weight(2f)) {
+                                Text(text = "Email")
                                 Text(
-                                    modifier = Modifier.weight(2f),
-                                    text = uiState.person?.accountType!!
+                                    text = uiState.person?.email!!,
+                                    fontSize = 20.sp
+                                )
+                                Text(text = "Privilege")
+                                Text(
+                                    text = uiState.person?.accountType!!,
+                                    fontSize = 20.sp
+
                                 )
                             }
                         }
                     }
+
                     Divider(
                         color = Color.Gray,
                         thickness = 1.dp,
                         modifier = Modifier.padding(top = 20.dp)
                     )
-                    Text(text = "Bid history")
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-//                            Text(text = "bid 1")
-                            Text(text = "item1")
-                            Text(text = "10 h ago")
-                            Text(text = "3$")
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-//                            Text(text = "bid 2")
-                            Text(text = "item2")
-                            Text(text = "11 h ago")
-                            Text(text = "5$")
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround
-                        ) {
-//                            Text(text = "bid 1")
-                            Text(text = "item3")
-                            Text(text = "13 h ago")
-                            Text(text = "33$")
+                    if (uiState.profileMode == EditMode.EDIT) {
+                        Button(modifier = Modifier.fillMaxWidth() , onClick = {viewModel.handleEvent(ProfileEvent.ApplyChanges) }) {
+                            Text("APPLY CHANGES")
                         }
                     }
+
                 }
             }
         )

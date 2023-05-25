@@ -49,7 +49,7 @@ interface ItemApi {
         @Part("aucDuration") aucDuration: RequestBody,
         @Part("imageUri") imageUri: RequestBody,
         @Path("userId") userId: Int,
-    ): Boolean
+    ): Response<Any>
 
     @Multipart
     @POST(ApiConstants.ITEMS_END_POINT + "{userId}")

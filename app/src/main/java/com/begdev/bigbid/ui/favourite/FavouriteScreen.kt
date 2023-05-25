@@ -39,24 +39,27 @@ fun TabScreen() {
         Screen.Liked,
         Screen.Bets
     )
-    Surface(        Modifier
-        .wrapContentHeight()
-        .fillMaxWidth()){
+    Surface(
+        Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+    ) {
 //    BigBidTheme{
-            Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(selectedTabIndex = tabIndex) {
-            tabs.forEachIndexed {index, screen ->
-                Tab(text = { Text(stringResource(screen.resourceId!!)) },
-                    selected = tabIndex == index,
-                    onClick = { tabIndex = index },
-                    icon = {Icon(screen.icon!!, contentDescription = null)}
-                )
+        Column(modifier = Modifier.fillMaxSize()) {
+            TabRow(selectedTabIndex = tabIndex) {
+                tabs.forEachIndexed { index, screen ->
+                    Tab(text = { Text(stringResource(screen.resourceId!!)) },
+                        selected = tabIndex == index,
+                        onClick = { tabIndex = index },
+                        icon = { Icon(screen.icon!!, contentDescription = null) }
+                    )
+                }
+            }
+            when (tabIndex) {
+                0 -> OwnerScreen()
+                1 -> LikedScreen()
+                2 -> BidsScreen()
             }
         }
-        when (tabIndex) {
-            0 -> OwnerScreen()
-            1 -> LikedScreen()
-            2 -> BidsScreen()
-        }
-    }}
+    }
 }
